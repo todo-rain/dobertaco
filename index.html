@@ -14,97 +14,47 @@
 
 <style>
   :root{
-    --paper:#FFF8ED;
-    --paper-soft:#FBEFD8;
-    --ink:#2E2620;
-    --ink-soft:#8A7A69;
-    --dog:#ED8546;
-    --dog-soft:#FBDAC0;
-    --cat:#5B2C82;
-    --cat-soft:#E6D7F2;
-    --line:#E7D8BE;
-    --good:#7CA588;
-    --bad:#C96A5A;
-    --shadow: 0 10px 30px rgba(46,38,32,0.16);
+    --paper:#FFF8ED; --paper-soft:#FBEFD8; --ink:#2E2620; --ink-soft:#8A7A69;
+    --dog:#ED8546; --dog-soft:#FBDAC0; --cat:#5B2C82; --cat-soft:#E6D7F2;
+    --line:#E7D8BE; --good:#7CA588; --bad:#C96A5A; --shadow: 0 10px 30px rgba(46,38,32,0.16);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     min-height:100vh;
-    background:
-      radial-gradient(circle at 15% 10%, #EFE0BF 0%, transparent 45%),
-      radial-gradient(circle at 85% 90%, #E4D3AE 0%, transparent 45%),
-      #D9C7A0;
-    font-family:'Nunito', sans-serif;
-    color:var(--ink);
-    display:flex;
-    justify-content:center;
-    padding:24px 12px;
+    background: radial-gradient(circle at 15% 10%, #EFE0BF 0%, transparent 45%), radial-gradient(circle at 85% 90%, #E4D3AE 0%, transparent 45%), #D9C7A0;
+    font-family:'Nunito', sans-serif; color:var(--ink);
+    display:flex; justify-content:center; padding:24px 12px;
   }
   .card{
-    width:100%;
-    max-width:460px;
-    background:var(--paper);
-    border-radius:28px;
-    box-shadow:var(--shadow);
-    overflow:hidden;
-    min-height:560px;
-    height:calc(100vh - 48px);
-    height:calc(100dvh - 48px);
-    max-height:820px;
-    display:flex;
-    flex-direction:column;
-    position:relative;
+    width:100%; max-width:460px; background:var(--paper); border-radius:28px; box-shadow:var(--shadow);
+    overflow:hidden; min-height:560px;
+    height:calc(100vh - 48px); height:calc(100dvh - 48px); max-height:820px;
+    display:flex; flex-direction:column; position:relative;
     animation:cardIn .5s cubic-bezier(.2,.8,.2,1);
   }
   @keyframes cardIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
 
-  /* ---------- Gate-style screens (setup / room / role) ---------- */
-  .gate{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:40px 28px;
-    text-align:center;
-    gap:18px;
-  }
+  /* ---------- Gate-style screens ---------- */
+  .gate{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 28px; text-align:center; gap:18px; }
   .gate h1{ font-family:'Baloo 2', sans-serif; font-size:24px; margin:0; }
   .gate p{ color:var(--ink-soft); margin:0; font-size:14.5px; max-width:280px; }
   .gate code{ background:var(--paper-soft); padding:2px 6px; border-radius:6px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; }
   .role-picks{ display:flex; gap:18px; }
   .role-btn{
-    background:var(--paper-soft);
-    border:2px solid var(--line);
-    border-radius:20px;
-    padding:20px 22px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:8px;
-    cursor:pointer;
-    font-family:'Baloo 2', sans-serif;
-    font-size:15px;
-    color:var(--ink);
+    background:var(--paper-soft); border:2px solid var(--line); border-radius:20px; padding:20px 22px;
+    display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer;
+    font-family:'Baloo 2', sans-serif; font-size:15px; color:var(--ink);
     transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
   }
   .role-btn .emoji{ font-size:34px; }
   .role-btn:hover{ transform:translateY(-3px) rotate(-1deg); box-shadow:0 8px 18px rgba(46,38,32,.14); }
   .role-btn.dog:hover{ border-color:var(--dog); }
   .role-btn.cat:hover{ border-color:var(--cat); }
-  .text-input{
-    border:2px solid var(--line); border-radius:14px; padding:12px 16px;
-    font-family:'Nunito', sans-serif; font-size:15px;
-    text-align:center; width:230px; background:var(--paper-soft); color:var(--ink); outline:none;
-  }
+  .text-input{ border:2px solid var(--line); border-radius:14px; padding:12px 16px; font-family:'Nunito', sans-serif; font-size:15px; text-align:center; width:230px; background:var(--paper-soft); color:var(--ink); outline:none; }
   .text-input:focus{ border-color:var(--ink-soft); }
   .field-error{ color:var(--bad); font-size:12px; min-height:16px; margin:0; }
-  .primary-btn{
-    border:none; background:var(--ink); color:var(--paper); font-family:'Baloo 2',sans-serif;
-    font-size:14px; padding:12px 30px; border-radius:14px; cursor:pointer;
-    transition:transform .15s ease;
-  }
+  .primary-btn{ border:none; background:var(--ink); color:var(--paper); font-family:'Baloo 2',sans-serif; font-size:14px; padding:12px 30px; border-radius:14px; cursor:pointer; transition:transform .15s ease; }
   .primary-btn:hover{ transform:translateY(-2px); }
   .primary-btn:active{ transform:translateY(0) scale(.97); }
 
@@ -113,17 +63,9 @@
   .pair-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .profile{ display:flex; align-items:center; gap:10px; }
   .profile.right{ flex-direction:row-reverse; text-align:right; }
-  .tag{
-    width:46px; height:46px; border-radius:14px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:22px; box-shadow:0 3px 0 rgba(0,0,0,0.14);
-    position:relative; flex:none; transform:rotate(-4deg);
-  }
+  .tag{ width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 3px 0 rgba(0,0,0,0.14); position:relative; flex:none; transform:rotate(-4deg); }
   .profile.right .tag{ transform:rotate(4deg); }
-  .tag::before{
-    content:''; position:absolute; top:-5px; left:9px;
-    width:8px; height:8px; border-radius:50%; background:#fff; border:3px solid var(--ink);
-  }
+  .tag::before{ content:''; position:absolute; top:-5px; left:9px; width:8px; height:8px; border-radius:50%; background:#fff; border:3px solid var(--ink); }
   .profile.right .tag::before{ left:auto; right:9px; }
   .tag.dog{ background:var(--dog-soft); }
   .tag.cat{ background:var(--cat-soft); }
@@ -136,83 +78,61 @@
   .role-label{ font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; font-family:'IBM Plex Mono', monospace; }
   .heart{ font-size:16px; color:var(--ink-soft); }
   .greeting{ margin-top:12px; font-size:13px; color:var(--ink-soft); }
-  .meta-row{
-    margin-top:6px; display:flex; justify-content:space-between; align-items:center;
-    font-size:11px; color:var(--ink-soft);
-  }
+  .meta-row{ margin-top:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--ink-soft); }
   .room-badge{ font-family:'IBM Plex Mono', monospace; }
   .switch-link{ text-decoration:underline; cursor:pointer; }
   .switch-link:hover{ color:var(--ink); }
 
-  /* =====================================================================
-     LIBRARY STAGE (new)
-     ===================================================================== */
+  /* ---------- Library stage ---------- */
   .stage{ position:relative; flex:1; min-height:0; overflow:hidden; background:#4F3224; }
-  #library-scene{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  #library-scene{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:manipulation; }
   #library-scene text{ font-family:'Baloo 2','Nunito',sans-serif; user-select:none; -webkit-user-select:none; }
   #library-scene .mono{ font-family:'IBM Plex Mono', monospace; }
 
   .hot{ cursor:pointer; outline:none; -webkit-tap-highlight-color:transparent; }
-  .hot .lift{
-    transition:transform .2s ease, filter .2s ease;
-    transform-box:fill-box; transform-origin:50% 100%;
-  }
+  .hot .lift{ transition:transform .2s ease, filter .2s ease; transform-box:fill-box; transform-origin:50% 100%; }
   .hot:hover .lift, .hot:focus-visible .lift{ transform:scale(1.04); filter:brightness(1.12); }
+  #book-hot:hover .lift, #book-hot:focus-visible .lift{ transform:translateY(-3px) scale(1.08); }
   .hot:active .lift{ transform:scale(.99); }
 
-  #book-art{ animation:bob 2.6s ease-in-out infinite; }
-  @keyframes bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
-  #book-halo{ animation:halo 2.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
-  @keyframes halo{ 0%,100%{ opacity:.55; transform:scale(1); } 50%{ opacity:1; transform:scale(1.14); } }
   .twinkle{ animation:twinkle 3s ease-in-out infinite; }
   @keyframes twinkle{ 0%,100%{ opacity:.35; } 50%{ opacity:1; } }
   .steam{ animation:steam 2.4s ease-in-out infinite; }
   @keyframes steam{ 0%,100%{ opacity:.15; transform:translateY(0); } 50%{ opacity:.6; transform:translateY(-3px); } }
 
-  .avatar{ animation:idle 3.4s ease-in-out infinite; cursor:pointer; }
-  #av-cat{ animation-delay:-1.7s; }
+  .avatar{ cursor:pointer; }
+  .av-in{ transform-box:fill-box; transform-origin:50% 100%; animation:idle 3.4s ease-in-out infinite; }
+  #av-cat .av-in{ animation-delay:-1.7s; }
   @keyframes idle{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-2px); } }
-  .av-in{ transform-box:fill-box; transform-origin:50% 100%; }
   .av-in.hop{ animation:hop .5s ease; }
   @keyframes hop{ 0%{ transform:translateY(0); } 35%{ transform:translateY(-12px) scale(1.04); } 70%{ transform:translateY(0) scale(.98); } 100%{ transform:translateY(0); } }
+  .avatar.walking .av-in{ animation:walk .34s ease-in-out infinite; }
+  @keyframes walk{ 0%,100%{ transform:rotate(-6deg) translateY(0); } 50%{ transform:rotate(6deg) translateY(-4px); } }
+  #tap-mark{ pointer-events:none; opacity:0; transform-box:fill-box; transform-origin:center; }
+  #tap-mark.ping{ animation:ping .6s ease-out; }
+  @keyframes ping{ from{ opacity:.9; transform:scale(.4); } to{ opacity:0; transform:scale(1.8); } }
 
   @media (prefers-reduced-motion: reduce){
-    #book-art, #book-halo, .twinkle, .steam, .avatar{ animation:none !important; }
+    .twinkle, .steam, .av-in, .avatar.walking .av-in{ animation:none !important; }
   }
 
   /* ---------- Views (open on top of the library) ---------- */
-  .view{
-    display:none; position:absolute; inset:0; z-index:20;
-    flex-direction:column; min-height:0; background:var(--paper);
-  }
+  .view{ display:none; position:absolute; inset:0; z-index:20; flex-direction:column; min-height:0; background:var(--paper); }
   .view.active{ display:flex; }
   #view-chat.active{ animation:bookOpen .55s cubic-bezier(.2,.8,.2,1) backwards; transform-origin:left center; }
-  @keyframes bookOpen{
-    from{ opacity:0; transform:perspective(1000px) rotateY(-75deg) scale(.85); }
-    to{ opacity:1; transform:perspective(1000px) rotateY(0) scale(1); }
-  }
+  @keyframes bookOpen{ from{ opacity:0; transform:perspective(1000px) rotateY(-75deg) scale(.85); } to{ opacity:1; transform:perspective(1000px) rotateY(0) scale(1); } }
   #view-planner.active{ animation:tableZoom .45s cubic-bezier(.2,.8,.2,1) backwards; transform-origin:50% 100%; }
-  @keyframes tableZoom{
-    from{ opacity:0; transform:scale(.78) translateY(50px); }
-    to{ opacity:1; transform:scale(1) translateY(0); }
-  }
+  @keyframes tableZoom{ from{ opacity:0; transform:scale(.78) translateY(50px); } to{ opacity:1; transform:scale(1) translateY(0); } }
 
   .view-bar{ display:flex; align-items:center; gap:10px; padding:10px 14px; flex:none; color:var(--paper); }
   .book-bar{ background:#2F5FB8; border-bottom:3px solid #E0B34A; }
   .table-bar{ background:#6B4430; border-bottom:3px solid #3E2619; }
-  .back-btn{
-    border:none; background:rgba(255,248,237,.18); color:inherit;
-    font-family:'Baloo 2', sans-serif; font-size:13px; padding:6px 12px; border-radius:10px; cursor:pointer;
-    transition:background .15s ease;
-  }
+  .back-btn{ border:none; background:rgba(255,248,237,.18); color:inherit; font-family:'Baloo 2', sans-serif; font-size:13px; padding:6px 12px; border-radius:10px; cursor:pointer; transition:background .15s ease; }
   .back-btn:hover{ background:rgba(255,248,237,.3); }
   .view-title{ font-family:'Baloo 2', sans-serif; font-size:15px; }
 
-  /* Chat (unchanged) */
-  .chat-scroll{
-    flex:1; overflow-y:auto; padding:18px 16px; display:flex; flex-direction:column; gap:10px;
-    background: repeating-linear-gradient(transparent, transparent 27px, var(--line) 28px);
-  }
+  /* Chat */
+  .chat-scroll{ flex:1; overflow-y:auto; padding:18px 16px; display:flex; flex-direction:column; gap:10px; background: repeating-linear-gradient(transparent, transparent 27px, var(--line) 28px); }
   .empty-state{ margin:auto; text-align:center; color:var(--ink-soft); font-size:14px; max-width:220px; }
   .empty-state .emoji{ font-size:30px; display:block; margin-bottom:8px; }
   .msg-row{ display:flex; align-items:flex-end; gap:8px; max-width:88%; animation:popIn .22s ease; }
@@ -226,42 +146,21 @@
   .bubble{ padding:9px 13px; border-radius:16px; font-size:14.5px; line-height:1.4; word-wrap:break-word; }
   .msg-row.me .bubble{ background:var(--ink); color:var(--paper); border-bottom-right-radius:4px; }
   .msg-row.them .bubble{ background:var(--paper-soft); border:1px solid var(--line); border-bottom-left-radius:4px; }
-  .msg-del{
-    border:none; background:none; cursor:pointer; font-size:12px; opacity:0;
-    transition:opacity .15s ease; padding:4px; flex:none;
-  }
+  .msg-del{ border:none; background:none; cursor:pointer; font-size:12px; opacity:0; transition:opacity .15s ease; padding:4px; flex:none; }
   .msg-row:hover .msg-del{ opacity:.5; }
   .msg-del:hover{ opacity:1 !important; }
   .msg-time{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--ink-soft); margin-top:3px; padding:0 4px; }
   .compose{ display:flex; gap:8px; padding:12px 16px 16px; border-top:1px solid var(--line); background:var(--paper); }
-  .compose input{
-    flex:1; border:2px solid var(--line); border-radius:16px; padding:10px 14px;
-    font-family:'Nunito', sans-serif; font-size:14px; background:var(--paper-soft); color:var(--ink);
-    outline:none; transition:border-color .15s ease;
-  }
+  .compose input{ flex:1; border:2px solid var(--line); border-radius:16px; padding:10px 14px; font-family:'Nunito', sans-serif; font-size:14px; background:var(--paper-soft); color:var(--ink); outline:none; transition:border-color .15s ease; }
   .compose input:focus{ border-color:var(--ink-soft); }
-  .send-btn{
-    border:none; background:var(--ink); color:var(--paper); width:44px; height:44px;
-    border-radius:14px; font-size:17px; cursor:pointer; flex:none; transition:transform .12s ease;
-  }
+  .send-btn{ border:none; background:var(--ink); color:var(--paper); width:44px; height:44px; border-radius:14px; font-size:17px; cursor:pointer; flex:none; transition:transform .12s ease; }
   .send-btn:hover{ transform:scale(1.06) rotate(-4deg); }
   .send-btn:active{ transform:scale(.94); }
 
-  /* Planner: top-down view of the table, with a clipboard on it */
-  #view-planner{
-    background:repeating-linear-gradient(90deg, #A9714B 0 46px, #9C6642 46px 48px);
-  }
-  .clipboard{
-    position:relative; flex:1; min-height:0; margin:24px 16px 16px;
-    background:#8B5A3C; padding:22px 10px 10px; border-radius:12px;
-    display:flex; flex-direction:column;
-    box-shadow:0 12px 24px rgba(0,0,0,.35);
-  }
-  .clip{
-    position:absolute; top:-10px; left:50%; width:96px; height:26px; margin-left:-48px; z-index:2;
-    background:linear-gradient(#D5D9DC,#9AA0A5); border-radius:7px;
-    box-shadow:0 3px 0 rgba(0,0,0,.25);
-  }
+  /* Planner */
+  #view-planner{ background:repeating-linear-gradient(90deg, #A9714B 0 46px, #9C6642 46px 48px); }
+  .clipboard{ position:relative; flex:1; min-height:0; margin:24px 16px 16px; background:#8B5A3C; padding:22px 10px 10px; border-radius:12px; display:flex; flex-direction:column; box-shadow:0 12px 24px rgba(0,0,0,.35); }
+  .clip{ position:absolute; top:-10px; left:50%; width:96px; height:26px; margin-left:-48px; z-index:2; background:linear-gradient(#D5D9DC,#9AA0A5); border-radius:7px; box-shadow:0 3px 0 rgba(0,0,0,.25); }
   .clip::after{ content:''; position:absolute; left:50%; top:7px; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:#6B4430; }
   .planner{ padding:16px; overflow-y:auto; flex:1; min-height:0; background:var(--paper); border-radius:4px; }
   .date-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
@@ -292,12 +191,7 @@
   .task-del:hover{ opacity:1; color:var(--bad); }
   .empty-planner{ text-align:center; color:var(--ink-soft); font-size:13.5px; padding:30px 10px; }
 
-  .toast{
-    position:absolute; left:50%; bottom:18px; transform:translateX(-50%) translateY(10px);
-    background:var(--ink); color:var(--paper); font-family:'IBM Plex Mono', monospace;
-    font-size:11px; padding:8px 16px; border-radius:20px; opacity:0; pointer-events:none;
-    transition:opacity .25s ease, transform .25s ease; z-index:50; white-space:nowrap;
-  }
+  .toast{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--paper); font-family:'IBM Plex Mono', monospace; font-size:11px; padding:8px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:50; white-space:nowrap; }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
   ::-webkit-scrollbar{ width:6px; }
@@ -308,15 +202,13 @@
 
 <div class="card" id="card">
 
-  <!-- SETUP NEEDED (shown until firebaseConfig below is filled in) -->
   <div class="gate" id="setup-needed" style="display:none;">
     <h1>🔧 One-time setup</h1>
     <p>This app saves your chat and to-do list in your own free Firebase project, so there's no size limit.</p>
-    <p>Open the file's code, find <code>firebaseConfig</code> near the top of the script, and paste in your project's config values. Full steps are in the chat where this was shared.</p>
+    <p>Open the file's code, find <code>firebaseConfig</code> near the top of the script, and paste in your project's config values.</p>
     <p class="field-error" id="setup-error-detail"></p>
   </div>
 
-  <!-- ROOM CODE GATE -->
   <div class="gate" id="room-gate" style="display:none;">
     <h1>🐾 Paws & Plans</h1>
     <p>Make up a private room code — anything only the two of you know. Whoever types it first, tell the other exactly what you typed.</p>
@@ -326,7 +218,6 @@
     <p style="font-size:11px;color:var(--ink-soft);max-width:250px;">Anyone who knows this exact code can open your space, so make it a little unusual — not "1234".</p>
   </div>
 
-  <!-- ROLE GATE -->
   <div class="gate" id="gate" style="display:none;">
     <h1>Whose paws are these?</h1>
     <p>Pick who you are on this device.</p>
@@ -372,27 +263,13 @@
     <!-- THE LIBRARY -->
     <div class="stage" id="stage">
 
-      <svg id="library-scene" viewBox="0 0 400 500" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="A cosy library. The blue book on the shelf opens the chat. The study table opens the to-do list.">
+      <svg id="library-scene" viewBox="0 0 400 500" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="A cosy library. Tap the floor to walk around. The one blue book on the shelf opens the chat. The study table opens the to-do list.">
         <defs>
-          <linearGradient id="wallGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="372">
-            <stop offset="0" stop-color="#6B4430"/><stop offset="1" stop-color="#4F3224"/>
-          </linearGradient>
-          <linearGradient id="floorGrad" gradientUnits="userSpaceOnUse" x1="0" y1="372" x2="0" y2="500">
-            <stop offset="0" stop-color="#B07A50"/><stop offset="1" stop-color="#86563A"/>
-          </linearGradient>
-          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#1B2547"/><stop offset="1" stop-color="#3A4F86"/>
-          </linearGradient>
-          <radialGradient id="haloGrad">
-            <stop offset="0" stop-color="#FFE9A0" stop-opacity=".95"/><stop offset="1" stop-color="#FFE9A0" stop-opacity="0"/>
-          </radialGradient>
-          <radialGradient id="lampGlow">
-            <stop offset="0" stop-color="#FFD98A" stop-opacity=".55"/><stop offset="1" stop-color="#FFD98A" stop-opacity="0"/>
-          </radialGradient>
-          <mask id="moonMask">
-            <rect x="0" y="0" width="400" height="500" fill="#fff"/>
-            <circle cx="226" cy="67" r="11" fill="#000"/>
-          </mask>
+          <linearGradient id="wallGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="372"><stop offset="0" stop-color="#6B4430"/><stop offset="1" stop-color="#4F3224"/></linearGradient>
+          <linearGradient id="floorGrad" gradientUnits="userSpaceOnUse" x1="0" y1="372" x2="0" y2="500"><stop offset="0" stop-color="#B07A50"/><stop offset="1" stop-color="#86563A"/></linearGradient>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2547"/><stop offset="1" stop-color="#3A4F86"/></linearGradient>
+          <radialGradient id="lampGlow"><stop offset="0" stop-color="#FFD98A" stop-opacity=".55"/><stop offset="1" stop-color="#FFD98A" stop-opacity="0"/></radialGradient>
+          <mask id="moonMask"><rect x="0" y="0" width="400" height="500" fill="#fff"/><circle cx="226" cy="67" r="11" fill="#000"/></mask>
         </defs>
 
         <!-- Wall, wainscot, floor -->
@@ -402,13 +279,11 @@
         <rect x="-400" y="364" width="1200" height="8" fill="#3E2619"/>
         <rect x="-400" y="372" width="1200" height="400" fill="url(#floorGrad)"/>
         <g stroke="#7A4C2F" stroke-opacity=".35" stroke-width="1.5">
-          <line x1="-400" x2="800" y1="392" y2="392"/>
-          <line x1="-400" x2="800" y1="416" y2="416"/>
-          <line x1="-400" x2="800" y1="446" y2="446"/>
-          <line x1="-400" x2="800" y1="482" y2="482"/>
+          <line x1="-400" x2="800" y1="392" y2="392"/><line x1="-400" x2="800" y1="416" y2="416"/>
+          <line x1="-400" x2="800" y1="446" y2="446"/><line x1="-400" x2="800" y1="482" y2="482"/>
         </g>
 
-        <!-- Window with night sky -->
+        <!-- Window -->
         <path d="M156 160 V84 A44 44 0 0 1 244 84 V160 Z" fill="url(#skyGrad)"/>
         <circle cx="218" cy="72" r="12" fill="#FFF1C2" mask="url(#moonMask)"/>
         <g fill="#FFFFFF">
@@ -430,18 +305,13 @@
         <rect x="14" y="36" width="124" height="336" fill="#7B4B30" stroke="#3E2619" stroke-width="3"/>
         <rect x="22" y="44" width="108" height="216" fill="#3A2318"/>
         <rect x="10" y="30" width="132" height="8" rx="2" fill="#8B5A3C"/>
-        <g fill="#8B5A3C">
-          <rect x="18" y="110" width="116" height="6"/>
-          <rect x="18" y="182" width="116" height="6"/>
-          <rect x="18" y="254" width="116" height="6"/>
-        </g>
+        <g fill="#8B5A3C"><rect x="18" y="110" width="116" height="6"/><rect x="18" y="182" width="116" height="6"/><rect x="18" y="254" width="116" height="6"/></g>
         <rect x="22" y="260" width="108" height="108" fill="#5E3825" stroke="#3E2619" stroke-width="2"/>
         <line x1="76" y1="262" x2="76" y2="366" stroke="#3E2619" stroke-width="2"/>
         <rect x="28" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
         <rect x="82" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
         <circle cx="70" cy="314" r="3" fill="#E0B34A"/><circle cx="82" cy="314" r="3" fill="#E0B34A"/>
         <g id="books-left"></g>
-        <!-- plant on top -->
         <rect x="50" y="16" width="20" height="14" rx="3" fill="#C96A5A"/>
         <g fill="#5E8B5E">
           <ellipse cx="54" cy="10" rx="4" ry="10" transform="rotate(-25 54 10)"/>
@@ -453,144 +323,103 @@
         <rect x="262" y="36" width="124" height="336" fill="#7B4B30" stroke="#3E2619" stroke-width="3"/>
         <rect x="270" y="44" width="108" height="216" fill="#3A2318"/>
         <rect x="258" y="30" width="132" height="8" rx="2" fill="#8B5A3C"/>
-        <g fill="#8B5A3C">
-          <rect x="266" y="110" width="116" height="6"/>
-          <rect x="266" y="182" width="116" height="6"/>
-          <rect x="266" y="254" width="116" height="6"/>
-        </g>
+        <g fill="#8B5A3C"><rect x="266" y="110" width="116" height="6"/><rect x="266" y="182" width="116" height="6"/><rect x="266" y="254" width="116" height="6"/></g>
         <rect x="270" y="260" width="108" height="108" fill="#5E3825" stroke="#3E2619" stroke-width="2"/>
         <line x1="324" y1="262" x2="324" y2="366" stroke="#3E2619" stroke-width="2"/>
         <rect x="276" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
         <rect x="330" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
         <circle cx="318" cy="314" r="3" fill="#E0B34A"/><circle cx="330" cy="314" r="3" fill="#E0B34A"/>
+        <!-- books (one of them, the only blue one, is the chat) are built by script -->
         <g id="books-right"></g>
-        <!-- stack of books on top -->
-        <rect x="300" y="22" width="44" height="8" rx="1.5" fill="#3F7D7A"/>
+        <rect x="300" y="22" width="44" height="8" rx="1.5" fill="#9B6B3F"/>
         <rect x="306" y="14" width="34" height="8" rx="1.5" fill="#D9A441"/>
         <rect x="302" y="6" width="38" height="8" rx="1.5" fill="#8C3B3B"/>
-
-        <!-- THE BLUE BOOK (opens the chat) -->
-        <g id="book-hot" class="hot" role="button" tabindex="0" data-open="chat" aria-label="Open the blue book to chat">
-          <rect x="290" y="108" width="76" height="102" fill="transparent"/>
-          <g class="lift">
-            <circle id="book-halo" cx="328" cy="150" r="38" fill="url(#haloGrad)"/>
-            <g id="book-art">
-              <g transform="rotate(-9 318 182)">
-                <rect x="312" y="124" width="30" height="58" rx="3" fill="#2F6FDE" stroke="#1B3F8F" stroke-width="2"/>
-                <rect x="312" y="124" width="7" height="58" rx="3" fill="#1B3F8F"/>
-                <rect x="322" y="132" width="16" height="2.5" fill="#E0B34A"/>
-                <rect x="322" y="170" width="16" height="2.5" fill="#E0B34A"/>
-                <text x="330" y="156" text-anchor="middle" font-size="13">💬</text>
-              </g>
-            </g>
-            <g id="book-badge" style="display:none">
-              <circle cx="346" cy="124" r="9" fill="#C96A5A" stroke="#FFF8ED" stroke-width="2"/>
-              <text id="book-badge-n" class="mono" x="346" y="127.5" text-anchor="middle" font-size="10" fill="#fff">1</text>
-            </g>
-            <rect x="294" y="190" width="62" height="18" rx="9" fill="#FFF8ED" stroke="#E7D8BE"/>
-            <text x="325" y="203" text-anchor="middle" font-size="10.5" fill="#2E2620">💬 Chat</text>
-          </g>
-        </g>
 
         <!-- Rug and floor shadow -->
         <ellipse cx="200" cy="462" rx="178" ry="28" fill="#8C3B3B"/>
         <ellipse cx="200" cy="462" rx="164" ry="23" fill="none" stroke="#D9A441" stroke-width="2" stroke-dasharray="6 4"/>
         <ellipse cx="200" cy="488" rx="176" ry="9" fill="#000" opacity=".22"/>
 
-        <!-- DOG (left chair) -->
-        <g id="av-dog" class="avatar" onclick="hop('dog')">
-          <rect x="65" y="296" width="80" height="100" rx="16" fill="#6B3F2A" stroke="#3E2619" stroke-width="3"/>
-          <rect x="73" y="304" width="64" height="84" rx="10" fill="#7B4B30"/>
-          <g class="av-in">
-            <ellipse cx="105" cy="392" rx="38" ry="36" fill="#ED8546"/>
-            <circle cx="105" cy="326" r="34" fill="#FBDAC0" stroke="#fff" stroke-width="2"/>
-            <text x="105" y="341" text-anchor="middle" font-size="44">🐶</text>
-          </g>
-          <g id="you-dog" style="display:none">
-            <rect x="89" y="268" width="32" height="14" rx="7" fill="#FFF8ED" stroke="#E7D8BE"/>
-            <path d="M101 282 l4 6 l4 -6 z" fill="#FFF8ED"/>
-            <text class="mono" x="105" y="278.5" text-anchor="middle" font-size="9" fill="#2E2620">you</text>
-          </g>
-        </g>
+        <!-- Walkers standing behind the table -->
+        <g id="layer-behind"></g>
 
-        <!-- CAT (right chair) -->
-        <g id="av-cat" class="avatar" onclick="hop('cat')">
-          <rect x="255" y="296" width="80" height="100" rx="16" fill="#6B3F2A" stroke="#3E2619" stroke-width="3"/>
-          <rect x="263" y="304" width="64" height="84" rx="10" fill="#7B4B30"/>
-          <g class="av-in">
-            <ellipse cx="295" cy="392" rx="38" ry="36" fill="#5B2C82"/>
-            <circle cx="295" cy="326" r="34" fill="#E6D7F2" stroke="#fff" stroke-width="2"/>
-            <text x="295" y="341" text-anchor="middle" font-size="44">🐱</text>
-          </g>
-          <g id="you-cat" style="display:none">
-            <rect x="279" y="268" width="32" height="14" rx="7" fill="#FFF8ED" stroke="#E7D8BE"/>
-            <path d="M291 282 l4 6 l4 -6 z" fill="#FFF8ED"/>
-            <text class="mono" x="295" y="278.5" text-anchor="middle" font-size="9" fill="#2E2620">you</text>
-          </g>
-        </g>
-
-        <!-- THE STUDY TABLE (opens the to-do list) -->
-        <g id="table-hot" class="hot" role="button" tabindex="0" data-open="planner" aria-label="Open the study table to-do list">
-          <rect x="20" y="376" width="360" height="114" fill="transparent"/>
-          <g class="lift">
-            <!-- legs -->
-            <rect x="72" y="426" width="10" height="36" fill="#55321F"/>
-            <rect x="318" y="426" width="10" height="36" fill="#55321F"/>
-            <rect x="38" y="438" width="14" height="48" rx="2" fill="#6B3F2A" stroke="#3E2619" stroke-width="1.5"/>
-            <rect x="348" y="438" width="14" height="48" rx="2" fill="#6B3F2A" stroke="#3E2619" stroke-width="1.5"/>
-            <!-- apron -->
-            <rect x="26" y="426" width="348" height="14" rx="3" fill="#7B4B30" stroke="#3E2619" stroke-width="2"/>
-            <!-- top -->
-            <polygon points="56,380 344,380 376,426 24,426" fill="#C98E5B" stroke="#3E2619" stroke-width="2" stroke-linejoin="round"/>
-            <polygon points="56,380 344,380 350,388 50,388" fill="#D9A06C"/>
-            <!-- lamp -->
-            <polygon points="322,396 352,396 368,424 306,424" fill="#FFD98A" opacity=".2"/>
-            <circle cx="334" cy="392" r="42" fill="url(#lampGlow)"/>
-            <ellipse cx="334" cy="412" rx="14" ry="4" fill="#2F5D4A"/>
-            <rect x="332" y="392" width="4" height="20" fill="#2F5D4A"/>
-            <path d="M320 392 L326 374 L342 374 L348 392 Z" fill="#3F7D6A" stroke="#2F5D4A" stroke-width="1.5" stroke-linejoin="round"/>
-            <!-- mug -->
-            <rect x="68" y="398" width="16" height="16" rx="3" fill="#EFE0BF" stroke="#3E2619" stroke-width="1.5"/>
-            <path d="M84 402 q7 0 7 6 q0 6 -7 6" fill="none" stroke="#EFE0BF" stroke-width="2.5"/>
-            <path class="steam" d="M73 394 q3 -4 0 -8" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
-            <path class="steam" style="animation-delay:-1.2s" d="M79 394 q3 -4 0 -8" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
-            <!-- little book stack -->
-            <rect x="262" y="408" width="34" height="7" rx="1" fill="#3F7D7A"/>
-            <rect x="266" y="401" width="28" height="7" rx="1" fill="#D9A441"/>
-            <!-- to-do notepad -->
-            <polygon points="168,392 232,392 240,420 160,420" fill="#FFF8ED" stroke="#D8C7A5" stroke-width="1"/>
-            <path d="M173 399.5 l2.5 2.5 l5 -5" fill="none" stroke="#7CA588" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="186" y1="399" x2="226" y2="399" stroke="#C9B48F"/>
-            <rect x="171" y="404" width="5" height="5" fill="none" stroke="#C9B48F"/>
-            <line x1="184" y1="407" x2="228" y2="407" stroke="#C9B48F"/>
-            <rect x="169" y="411" width="5" height="5" fill="none" stroke="#C9B48F"/>
-            <line x1="182" y1="414" x2="230" y2="414" stroke="#C9B48F"/>
-            <rect x="236" y="402" width="26" height="4" rx="1" fill="#D9A441" transform="rotate(18 236 402)"/>
-            <!-- name plates -->
-            <text id="svg-name-dog" x="105" y="437" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FFF8ED">Pup</text>
-            <text id="svg-name-cat" x="295" y="437" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FFF8ED">Kitty</text>
-            <!-- label -->
-            <rect x="148" y="454" width="104" height="22" rx="11" fill="#FFF8ED" stroke="#E7D8BE"/>
-            <text x="200" y="469" text-anchor="middle" font-size="11" fill="#2E2620">📋 To-Do list</text>
-            <g id="table-badge" style="display:none">
-              <circle cx="250" cy="455" r="9" fill="#C96A5A" stroke="#FFF8ED" stroke-width="2"/>
-              <text id="table-badge-n" class="mono" x="250" y="458.5" text-anchor="middle" font-size="10" fill="#fff">1</text>
+        <!-- THE STUDY TABLE (opens the to-do list), scaled to leave room to walk around it -->
+        <g transform="translate(200 486) scale(.72) translate(-200 -486)">
+          <g id="table-hot" class="hot" role="button" tabindex="0" data-open="planner" aria-label="Open the study table to-do list">
+            <g class="lift">
+              <rect x="72" y="426" width="10" height="36" fill="#55321F"/>
+              <rect x="318" y="426" width="10" height="36" fill="#55321F"/>
+              <rect x="38" y="438" width="14" height="48" rx="2" fill="#6B3F2A" stroke="#3E2619" stroke-width="1.5"/>
+              <rect x="348" y="438" width="14" height="48" rx="2" fill="#6B3F2A" stroke="#3E2619" stroke-width="1.5"/>
+              <rect x="26" y="426" width="348" height="14" rx="3" fill="#7B4B30" stroke="#3E2619" stroke-width="2"/>
+              <polygon points="56,380 344,380 376,426 24,426" fill="#C98E5B" stroke="#3E2619" stroke-width="2" stroke-linejoin="round"/>
+              <polygon points="56,380 344,380 350,388 50,388" fill="#D9A06C"/>
+              <polygon points="322,396 352,396 368,424 306,424" fill="#FFD98A" opacity=".2"/>
+              <circle cx="334" cy="392" r="42" fill="url(#lampGlow)"/>
+              <ellipse cx="334" cy="412" rx="14" ry="4" fill="#2F5D4A"/>
+              <rect x="332" y="392" width="4" height="20" fill="#2F5D4A"/>
+              <path d="M320 392 L326 374 L342 374 L348 392 Z" fill="#3F7D6A" stroke="#2F5D4A" stroke-width="1.5" stroke-linejoin="round"/>
+              <rect x="68" y="398" width="16" height="16" rx="3" fill="#EFE0BF" stroke="#3E2619" stroke-width="1.5"/>
+              <path d="M84 402 q7 0 7 6 q0 6 -7 6" fill="none" stroke="#EFE0BF" stroke-width="2.5"/>
+              <path class="steam" d="M73 394 q3 -4 0 -8" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+              <path class="steam" style="animation-delay:-1.2s" d="M79 394 q3 -4 0 -8" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+              <rect x="262" y="408" width="34" height="7" rx="1" fill="#9B6B3F"/>
+              <rect x="266" y="401" width="28" height="7" rx="1" fill="#D9A441"/>
+              <polygon points="168,392 232,392 240,420 160,420" fill="#FFF8ED" stroke="#D8C7A5" stroke-width="1"/>
+              <path d="M173 399.5 l2.5 2.5 l5 -5" fill="none" stroke="#7CA588" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="186" y1="399" x2="226" y2="399" stroke="#C9B48F"/>
+              <rect x="171" y="404" width="5" height="5" fill="none" stroke="#C9B48F"/>
+              <line x1="184" y1="407" x2="228" y2="407" stroke="#C9B48F"/>
+              <rect x="169" y="411" width="5" height="5" fill="none" stroke="#C9B48F"/>
+              <line x1="182" y1="414" x2="230" y2="414" stroke="#C9B48F"/>
+              <rect x="236" y="402" width="26" height="4" rx="1" fill="#D9A441" transform="rotate(18 236 402)"/>
+              <rect x="148" y="446" width="104" height="22" rx="11" fill="#FFF8ED" stroke="#E7D8BE"/>
+              <text x="200" y="461" text-anchor="middle" font-size="11" fill="#2E2620">📋 To-Do list</text>
+              <g id="table-badge" style="display:none">
+                <circle cx="250" cy="447" r="9" fill="#C96A5A" stroke="#FFF8ED" stroke-width="2"/>
+                <text id="table-badge-n" class="mono" x="250" y="450.5" text-anchor="middle" font-size="10" fill="#fff">1</text>
+              </g>
             </g>
           </g>
         </g>
+
+        <!-- Walkers standing in front of the table -->
+        <g id="layer-front">
+          <!-- DOG -->
+          <g id="av-dog" class="avatar" data-role="dog">
+            <ellipse cx="0" cy="0" rx="22" ry="6" fill="#000" opacity=".25"/>
+            <g class="av-in">
+              <ellipse cx="0" cy="-20" rx="19" ry="20" fill="#ED8546"/>
+              <circle cx="0" cy="-52" r="22" fill="#FBDAC0" stroke="#fff" stroke-width="2"/>
+              <text x="0" y="-41" text-anchor="middle" font-size="30">🐶</text>
+            </g>
+            <text id="svg-name-dog" x="0" y="-84" text-anchor="middle" font-size="10" font-weight="600" fill="#2E2620" stroke="#FFF8ED" stroke-width="3" stroke-linejoin="round" paint-order="stroke">Pup</text>
+            <g id="you-dog" style="display:none"><path class="twinkle" d="M-5 -102 l5 7 l5 -7 z" fill="#ED8546" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
+          </g>
+          <!-- CAT -->
+          <g id="av-cat" class="avatar" data-role="cat">
+            <ellipse cx="0" cy="0" rx="22" ry="6" fill="#000" opacity=".25"/>
+            <g class="av-in">
+              <ellipse cx="0" cy="-20" rx="19" ry="20" fill="#5B2C82"/>
+              <circle cx="0" cy="-52" r="22" fill="#E6D7F2" stroke="#fff" stroke-width="2"/>
+              <text x="0" y="-41" text-anchor="middle" font-size="30">🐱</text>
+            </g>
+            <text id="svg-name-cat" x="0" y="-84" text-anchor="middle" font-size="10" font-weight="600" fill="#2E2620" stroke="#FFF8ED" stroke-width="3" stroke-linejoin="round" paint-order="stroke">Kitty</text>
+            <g id="you-cat" style="display:none"><path class="twinkle" d="M-5 -102 l5 7 l5 -7 z" fill="#5B2C82" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
+          </g>
+        </g>
+
+        <circle id="tap-mark" cx="0" cy="0" r="7" fill="none" stroke="#FFF8ED" stroke-width="2"/>
       </svg>
 
-      <!-- CHAT VIEW (the blue book) — the chatbox itself is unchanged -->
+      <!-- CHAT VIEW (the blue book) -->
       <div class="view" id="view-chat">
         <div class="view-bar book-bar">
           <button class="back-btn" onclick="closeView()">← Library</button>
           <span class="view-title">📘 Our blue book</span>
         </div>
         <div class="chat-scroll" id="chat-scroll">
-          <div class="empty-state" id="chat-empty">
-            <span class="emoji">🐾💬</span>
-            Nothing said yet. Say hi first!
-          </div>
+          <div class="empty-state" id="chat-empty"><span class="emoji">🐾💬</span>Nothing said yet. Say hi first!</div>
         </div>
         <div class="compose">
           <input type="text" id="chat-input" placeholder="Type something sweet…" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage()">
@@ -615,7 +444,6 @@
               </div>
               <button onclick="shiftDate(1)">▶</button>
             </div>
-
             <div class="add-form">
               <input type="time" id="new-time" value="09:00">
               <input type="text" id="new-title" placeholder="What's happening?" maxlength="80">
@@ -626,7 +454,6 @@
               </div>
               <button class="add-btn" onclick="addTask()">+ Add to today</button>
             </div>
-
             <div class="list-heading">To-Do List</div>
             <div class="task-list" id="task-list"></div>
           </div>
@@ -664,17 +491,30 @@
   let openName = null;       // 'chat' | 'planner' | null (library)
   let lastSeenTime = 0;      // newest chat message you've seen
 
+  // Small per-device storage: localStorage first, window.storage as a fallback
+  const store = {
+    async get(k){
+      try{ const v = localStorage.getItem('paws:'+k); return v === null ? null : { value: v }; }catch(e){}
+      try{ if(window.storage) return await window.storage.get(k, false); }catch(e){}
+      return null;
+    },
+    async set(k, v){
+      try{ localStorage.setItem('paws:'+k, v); return; }catch(e){}
+      try{ if(window.storage) await window.storage.set(k, v, false); }catch(e){}
+    },
+    async delete(k){
+      try{ localStorage.removeItem('paws:'+k); }catch(e){}
+      try{ if(window.storage) await window.storage.delete(k, false); }catch(e){}
+    }
+  };
+
   function escapeHtml(str){
     const d = document.createElement('div');
     d.innerText = str;
     return d.innerHTML;
   }
-
   function dateKey(d){
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    const day = String(d.getDate()).padStart(2,'0');
-    return `${y}-${m}-${day}`;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
   function isSameDay(a,b){
     return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
@@ -687,10 +527,12 @@
     return s.slice(0, 60);
   }
 
-  // ---------- library books (decorative) ----------
+  // ---------- library books ----------
+  // Every book is built the same way. Exactly one of them is blue, and that one opens the chat.
   (function buildBooks(){
     const NS = 'http://www.w3.org/2000/svg';
-    const colors = ['#C96A5A','#3F7D7A','#D9A441','#5E8B5E','#EFE0BF','#8E5A86','#8C3B3B','#8A8F4F','#D99A9A','#B5651D'];
+    const BLUE = '#2F6FDE';
+    const colors = ['#C96A5A','#9B6B3F','#D9A441','#5E8B5E','#EFE0BF','#8E5A86','#8C3B3B','#8A8F4F','#D99A9A','#B5651D'];
     let seed = 11;
     const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
     function el(name, attrs, parent){
@@ -699,29 +541,46 @@
       parent.appendChild(e);
       return e;
     }
-    function fillRow(g, x0, x1, base, skip){
-      let x = x0;
+    function fillRow(g, x0, x1, base, blueIdx){
+      let x = x0, count = 0;
       while(x < x1 - 8){
-        const w = Math.round(8 + rnd() * 8);
-        if(skip && x < skip[1] && x + w > skip[0]){ x = skip[1]; continue; }
+        const isBlue = blueIdx !== null && count === blueIdx;
+        let w = Math.round(8 + rnd() * 8);
+        if(isBlue) w = 12;
         if(x + w > x1) break;
-        const h = Math.round(36 + rnd() * 22);
-        const c = colors[Math.floor(rnd() * colors.length)];
-        const b = el('g', {}, g);
+        let h = Math.round(36 + rnd() * 22);
+        let c = colors[Math.floor(rnd() * colors.length)];
+        if(isBlue){ h = 50; c = BLUE; }
+
+        let hot = null, parent = g;
+        if(isBlue){
+          hot = el('g', { id:'book-hot', class:'hot', role:'button', tabindex:'0', 'data-open':'chat', 'aria-label':'Open the blue book to chat' }, g);
+          el('rect', { x:x-3, y:base-h-3, width:w+6, height:h+6, fill:'transparent' }, hot);
+          parent = el('g', { class:'lift' }, hot);
+        }
+        const b = el('g', {}, parent);
         el('rect', { x:x, y:base-h, width:w, height:h, rx:1.5, fill:c, stroke:'rgba(0,0,0,.28)', 'stroke-width':.8 }, b);
         el('rect', { x:x, y:base-h+5, width:w, height:2.5, fill:'rgba(255,255,255,.35)' }, b);
         el('rect', { x:x, y:base-10, width:w, height:2.5, fill:'rgba(0,0,0,.2)' }, b);
+
+        if(isBlue){
+          const badge = el('g', { id:'book-badge', style:'display:none' }, hot);
+          el('circle', { cx:x+w, cy:base-h-1, r:8, fill:'#C96A5A', stroke:'#FFF8ED', 'stroke-width':2 }, badge);
+          const t = el('text', { id:'book-badge-n', class:'mono', x:x+w, y:base-h+2.5, 'text-anchor':'middle', 'font-size':9, fill:'#fff' }, badge);
+          t.textContent = '1';
+        }
+        count++;
         x += w + (rnd() < 0.15 ? 6 + rnd() * 6 : 0.8);
       }
     }
     const left = document.getElementById('books-left');
     const right = document.getElementById('books-right');
     [110, 182, 254].forEach(base => fillRow(left, 24, 128, base, null));
-    [110, 182, 254].forEach(base => fillRow(right, 272, 376, base, base === 182 ? [298, 356] : null));
+    [110, 182, 254].forEach(base => fillRow(right, 272, 376, base, base === 182 ? 4 : null));
   })();
 
   // ---------- toast ----------
-  function showToast(text){
+  function showToast(text, ms){
     let t = document.getElementById('toast');
     if(!t){
       t = document.createElement('div');
@@ -734,7 +593,7 @@
     void t.offsetWidth;
     t.classList.add('show');
     clearTimeout(t._hideTimer);
-    t._hideTimer = setTimeout(()=>{ t.classList.remove('show'); }, 1600);
+    t._hideTimer = setTimeout(()=>{ t.classList.remove('show'); }, ms || 1600);
   }
 
   // ---------- boot ----------
@@ -758,7 +617,7 @@
     }
 
     let savedRoom = null;
-    try{ const r = await window.storage.get('room-code', false); savedRoom = r && r.value; }catch(e){}
+    try{ const r = await store.get('room-code'); savedRoom = r && r.value; }catch(e){}
     if(savedRoom){
       roomId = savedRoom;
       await afterRoom();
@@ -772,14 +631,14 @@
     const err = document.getElementById('room-error');
     if(!val){ err.innerText = 'Type a code first.'; return; }
     roomId = sanitizeRoomId(val);
-    try{ await window.storage.set('room-code', roomId, false); }catch(e){}
+    await store.set('room-code', roomId);
     document.getElementById('room-gate').style.display = 'none';
     await afterRoom();
   }
 
   async function afterRoom(){
     let savedRole = null;
-    try{ const r = await window.storage.get('my-role', false); savedRole = r && r.value; }catch(e){}
+    try{ const r = await store.get('my-role'); savedRole = r && r.value; }catch(e){}
     if(savedRole){
       myRole = savedRole;
       showMain();
@@ -790,15 +649,15 @@
 
   async function selectRole(role){
     myRole = role;
-    try{ await window.storage.set('my-role', role, false); }catch(e){}
+    await store.set('my-role', role);
     document.getElementById('gate').style.display = 'none';
     showMain();
   }
 
   async function switchDevice(){
     if(!confirm("This resets the room code and role on this device only. You'll re-enter them. Continue?")) return;
-    try{ await window.storage.delete('room-code', false); }catch(e){}
-    try{ await window.storage.delete('my-role', false); }catch(e){}
+    await store.delete('room-code');
+    await store.delete('my-role');
     location.reload();
   }
 
@@ -811,6 +670,7 @@
     attachMessagesListener();
     attachPlannerListener();
     renderDateLabel();
+    startWalking();
   }
 
   function attachProfileListener(){
@@ -828,15 +688,12 @@
     document.getElementById('edit-dog').style.display = myRole === 'dog' ? 'inline' : 'none';
     document.getElementById('edit-cat').style.display = myRole === 'cat' ? 'inline' : 'none';
 
-    // library scene: name plates, "you" marker
     document.getElementById('svg-name-dog').textContent = profiles.dog.name;
     document.getElementById('svg-name-cat').textContent = profiles.cat.name;
     document.getElementById('you-dog').style.display = myRole === 'dog' ? '' : 'none';
     document.getElementById('you-cat').style.display = myRole === 'cat' ? '' : 'none';
 
     const undone = tasks.filter(t => !t.done && (t.who === myRole || t.who === 'both')).length;
-
-    // library scene: to-do count on the table
     document.getElementById('table-badge').style.display = undone > 0 ? '' : 'none';
     document.getElementById('table-badge-n').textContent = undone > 9 ? '9+' : String(undone);
 
@@ -865,6 +722,7 @@
   function openView(name){
     const chat = name === 'chat';
     openName = name;
+    keys = {};
     document.getElementById('view-chat').classList.toggle('active', chat);
     document.getElementById('view-planner').classList.toggle('active', !chat);
     if(chat){
@@ -879,7 +737,6 @@
     openName = null;
     document.getElementById('view-chat').classList.remove('active');
     document.getElementById('view-planner').classList.remove('active');
-    // always come back to today's plans
     if(!isSameDay(currentDate, new Date())){
       currentDate = new Date();
       renderDateLabel();
@@ -908,10 +765,194 @@
     showToast(role === 'dog' ? '🐶 woof!' : '🐱 meow~');
   }
 
+  // ---------- walking around the library ----------
+  const BOUNDS = { minX:28, maxX:372, minY:392, maxY:494 };
+  const BLOCK  = { x1:66, y1:398, x2:334, y2:458 };   // the study table's footprint
+  const FRONT_Y = 446;                                  // feet below this = in front of the table
+  const SPEED = 115;                                    // svg units per second
+  const pos = { dog:{ x:78, y:474 }, cat:{ x:322, y:474 } };
+  const remote = {};
+  let path = [];
+  let keys = {};
+  let lastSend = 0, wasMoving = false, restored = false, loopOn = false, lastFrame = 0;
+
+  const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+  const inBlock = (x,y) => x > BLOCK.x1 && x < BLOCK.x2 && y > BLOCK.y1 && y < BLOCK.y2;
+
+  function clearLine(a, b){
+    for(let i = 0; i <= 24; i++){
+      const t = i / 24;
+      if(inBlock(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t)) return false;
+    }
+    return true;
+  }
+  function planPath(a, b){
+    if(clearLine(a, b)) return [b];
+    const m = 4;
+    const C = [
+      { x:BLOCK.x1-m, y:BLOCK.y1-m }, { x:BLOCK.x2+m, y:BLOCK.y1-m },
+      { x:BLOCK.x2+m, y:BLOCK.y2+m }, { x:BLOCK.x1-m, y:BLOCK.y2+m }
+    ];
+    const d = (p,q) => Math.hypot(p.x-q.x, p.y-q.y);
+    let best = null, bestLen = Infinity;
+    for(let i = 0; i < 4; i++){
+      if(clearLine(a, C[i]) && clearLine(C[i], b)){
+        const len = d(a,C[i]) + d(C[i],b);
+        if(len < bestLen){ bestLen = len; best = [C[i], b]; }
+      }
+      for(let j = 0; j < 4; j++){
+        if(i === j) continue;
+        if(clearLine(a, C[i]) && clearLine(C[i], C[j]) && clearLine(C[j], b)){
+          const len = d(a,C[i]) + d(C[i],C[j]) + d(C[j],b);
+          if(len < bestLen){ bestLen = len; best = [C[i], C[j], b]; }
+        }
+      }
+    }
+    return best || [b];
+  }
+
+  function walkTo(x, y){
+    if(!myRole) return;
+    let tx = clamp(x, BOUNDS.minX, BOUNDS.maxX), ty = clamp(y, BOUNDS.minY, BOUNDS.maxY);
+    if(inBlock(tx, ty)){
+      const sides = [[tx-BLOCK.x1,'l'],[BLOCK.x2-tx,'r'],[ty-BLOCK.y1,'t'],[BLOCK.y2-ty,'b']].sort((p,q)=>p[0]-q[0]);
+      const s = sides[0][1];
+      if(s==='l') tx = BLOCK.x1 - 4; else if(s==='r') tx = BLOCK.x2 + 4;
+      else if(s==='t') ty = BLOCK.y1 - 4; else ty = BLOCK.y2 + 4;
+      tx = clamp(tx, BOUNDS.minX, BOUNDS.maxX); ty = clamp(ty, BOUNDS.minY, BOUNDS.maxY);
+    }
+    path = planPath(pos[myRole], { x:tx, y:ty });
+    const m = document.getElementById('tap-mark');
+    m.setAttribute('cx', tx); m.setAttribute('cy', ty);
+    m.classList.remove('ping'); void m.getBoundingClientRect(); m.classList.add('ping');
+  }
+
+  function applyAvatar(role){
+    const el = document.getElementById('av-'+role);
+    if(!el) return;
+    const p = pos[role];
+    const s = 0.82 + 0.3 * (p.y - BOUNDS.minY) / (BOUNDS.maxY - BOUNDS.minY);
+    el.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) scale(${s.toFixed(3)})`);
+    const layer = document.getElementById(p.y < FRONT_Y ? 'layer-behind' : 'layer-front');
+    if(el.parentNode !== layer) layer.appendChild(el);
+  }
+  function sortLayer(id){
+    const l = document.getElementById(id), k = l.children;
+    if(k.length === 2 && pos[k[0].getAttribute('data-role')].y > pos[k[1].getAttribute('data-role')].y) l.appendChild(k[0]);
+  }
+  function setWalking(role, on){
+    const el = document.getElementById('av-'+role);
+    if(el) el.classList.toggle('walking', on);
+  }
+  function sendPos(){
+    if(!db || !roomId || !myRole) return;
+    const p = pos[myRole];
+    try{ db.ref('rooms/'+roomId+'/pos/'+myRole).set({ x:Math.round(p.x), y:Math.round(p.y) }).catch(()=>{}); }catch(e){}
+  }
+
+  function stepMine(dt, now){
+    const p = pos[myRole];
+    let vx = (keys.right?1:0) - (keys.left?1:0), vy = (keys.down?1:0) - (keys.up?1:0);
+    let moving = false;
+    if(vx || vy){
+      path = [];
+      const len = Math.hypot(vx, vy); vx /= len; vy /= len;
+      let nx = clamp(p.x + vx*SPEED*dt, BOUNDS.minX, BOUNDS.maxX);
+      let ny = clamp(p.y + vy*SPEED*dt, BOUNDS.minY, BOUNDS.maxY);
+      if(inBlock(nx, ny)){
+        if(!inBlock(nx, p.y)) ny = p.y; else if(!inBlock(p.x, ny)) nx = p.x; else { nx = p.x; ny = p.y; }
+      }
+      p.x = nx; p.y = ny; moving = true;
+    } else if(path.length){
+      const t = path[0], dx = t.x - p.x, dy = t.y - p.y, d = Math.hypot(dx, dy), step = SPEED*dt;
+      if(d <= step){ p.x = t.x; p.y = t.y; path.shift(); }
+      else { p.x += dx/d*step; p.y += dy/d*step; }
+      moving = true;
+    }
+    if(moving && now - lastSend > 110){ lastSend = now; sendPos(); }
+    if(!moving && wasMoving) sendPos();
+    wasMoving = moving;
+    setWalking(myRole, moving);
+  }
+
+  function stepOther(dt){
+    const other = myRole === 'dog' ? 'cat' : 'dog';
+    const r = remote[other], p = pos[other];
+    if(!r) return;
+    const dx = r.x - p.x, dy = r.y - p.y, d = Math.hypot(dx, dy);
+    if(d < 0.4){ setWalking(other, false); return; }
+    const f = Math.min(1, 9*dt);
+    p.x += dx*f; p.y += dy*f;
+    setWalking(other, d > 2.5);
+  }
+
+  function tick(now){
+    const dt = Math.min(0.05, (now - lastFrame) / 1000);
+    lastFrame = now;
+    if(myRole){ stepMine(dt, now); stepOther(dt); }
+    applyAvatar('dog'); applyAvatar('cat');
+    sortLayer('layer-behind'); sortLayer('layer-front');
+    requestAnimationFrame(tick);
+  }
+
+  function startWalking(){
+    if(loopOn) return;
+    loopOn = true;
+    db.ref('rooms/'+roomId+'/pos').on('value', snap => {
+      const v = snap.val() || {};
+      ['dog','cat'].forEach(r => {
+        const q = v[r];
+        if(!q || typeof q.x !== 'number' || typeof q.y !== 'number') return;
+        const x = clamp(q.x, BOUNDS.minX, BOUNDS.maxX), y = clamp(q.y, BOUNDS.minY, BOUNDS.maxY);
+        if(r === myRole){
+          if(!restored){ pos[r].x = x; pos[r].y = y; }
+        } else {
+          if(!remote[r]){ pos[r].x = x; pos[r].y = y; }
+          remote[r] = { x, y };
+        }
+      });
+      restored = true;
+    });
+    lastFrame = performance.now();
+    requestAnimationFrame(tick);
+
+    store.get('hint-seen').then(r => {
+      if(r && r.value) return;
+      store.set('hint-seen', '1');
+      setTimeout(() => showToast('🐾 Tap the floor to walk · blue book = chat', 3600), 900);
+    });
+  }
+
+  // tap the floor to walk; tap your friend to hear them
+  const scene = document.getElementById('library-scene');
+  scene.addEventListener('click', e => {
+    if(e.target.closest('.hot')) return;
+    const av = e.target.closest('.avatar');
+    if(av){ hop(av.getAttribute('data-role')); return; }
+    const pt = scene.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const p = pt.matrixTransform(scene.getScreenCTM().inverse());
+    if(p.y < 380) return;
+    walkTo(p.x, p.y);
+  });
+
+  // arrow keys / WASD also work on a computer
+  const KEYMAP = { ArrowLeft:'left', a:'left', A:'left', ArrowRight:'right', d:'right', D:'right', ArrowUp:'up', w:'up', W:'up', ArrowDown:'down', s:'down', S:'down' };
+  document.addEventListener('keydown', e => {
+    const k = KEYMAP[e.key];
+    if(!k || openName || !myRole || e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    keys[k] = true;
+    e.preventDefault();
+  });
+  document.addEventListener('keyup', e => { const k = KEYMAP[e.key]; if(k) keys[k] = false; });
+  window.addEventListener('blur', () => { keys = {}; });
+
   // ---------- unread badge on the blue book ----------
   async function loadSeen(){
     try{
-      const r = await window.storage.get('chat-seen-'+roomId, false);
+      const r = await store.get('chat-seen-'+roomId);
       lastSeenTime = (r && r.value) ? Number(r.value) : Date.now();
     }catch(e){
       lastSeenTime = Date.now();
@@ -923,9 +964,7 @@
     if(messages.length){
       lastSeenTime = Math.max(lastSeenTime, ...messages.map(m => m.time || 0));
     }
-    Promise.resolve()
-      .then(() => window.storage.set('chat-seen-'+roomId, String(lastSeenTime), false))
-      .catch(() => {});
+    store.set('chat-seen-'+roomId, String(lastSeenTime));
     updateBookBadge();
   }
 
