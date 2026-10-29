@@ -48,7 +48,10 @@
     border-radius:28px;
     box-shadow:var(--shadow);
     overflow:hidden;
-    min-height:80vh;
+    min-height:560px;
+    height:calc(100vh - 48px);
+    height:calc(100dvh - 48px);
+    max-height:820px;
     display:flex;
     flex-direction:column;
     position:relative;
@@ -106,7 +109,7 @@
   .primary-btn:active{ transform:translateY(0) scale(.97); }
 
   /* ---------- Header ---------- */
-  .header{ padding:18px 20px 10px; border-bottom:1px solid var(--line); background:var(--paper); }
+  .header{ padding:18px 20px 10px; border-bottom:1px solid var(--line); background:var(--paper); flex:none; }
   .pair-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .profile{ display:flex; align-items:center; gap:10px; }
   .profile.right{ flex-direction:row-reverse; text-align:right; }
@@ -141,20 +144,71 @@
   .switch-link{ text-decoration:underline; cursor:pointer; }
   .switch-link:hover{ color:var(--ink); }
 
-  /* ---------- Tabs ---------- */
-  .tabs{ display:flex; gap:6px; padding:12px 20px 0; background:var(--paper); }
-  .tab-btn{
-    flex:1; border:none; background:var(--paper-soft); color:var(--ink-soft);
-    font-family:'Baloo 2', sans-serif; font-size:14px; padding:10px 0;
-    border-radius:14px 14px 0 0; cursor:pointer; transition:background .15s ease, color .15s ease;
+  /* =====================================================================
+     LIBRARY STAGE (new)
+     ===================================================================== */
+  .stage{ position:relative; flex:1; min-height:0; overflow:hidden; background:#4F3224; }
+  #library-scene{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  #library-scene text{ font-family:'Baloo 2','Nunito',sans-serif; user-select:none; -webkit-user-select:none; }
+  #library-scene .mono{ font-family:'IBM Plex Mono', monospace; }
+
+  .hot{ cursor:pointer; outline:none; -webkit-tap-highlight-color:transparent; }
+  .hot .lift{
+    transition:transform .2s ease, filter .2s ease;
+    transform-box:fill-box; transform-origin:50% 100%;
   }
-  .tab-btn.active{ background:var(--ink); color:var(--paper); }
+  .hot:hover .lift, .hot:focus-visible .lift{ transform:scale(1.04); filter:brightness(1.12); }
+  .hot:active .lift{ transform:scale(.99); }
 
-  /* ---------- Views ---------- */
-  .view{ flex:1; display:none; flex-direction:column; min-height:0; }
+  #book-art{ animation:bob 2.6s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+  #book-halo{ animation:halo 2.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+  @keyframes halo{ 0%,100%{ opacity:.55; transform:scale(1); } 50%{ opacity:1; transform:scale(1.14); } }
+  .twinkle{ animation:twinkle 3s ease-in-out infinite; }
+  @keyframes twinkle{ 0%,100%{ opacity:.35; } 50%{ opacity:1; } }
+  .steam{ animation:steam 2.4s ease-in-out infinite; }
+  @keyframes steam{ 0%,100%{ opacity:.15; transform:translateY(0); } 50%{ opacity:.6; transform:translateY(-3px); } }
+
+  .avatar{ animation:idle 3.4s ease-in-out infinite; cursor:pointer; }
+  #av-cat{ animation-delay:-1.7s; }
+  @keyframes idle{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-2px); } }
+  .av-in{ transform-box:fill-box; transform-origin:50% 100%; }
+  .av-in.hop{ animation:hop .5s ease; }
+  @keyframes hop{ 0%{ transform:translateY(0); } 35%{ transform:translateY(-12px) scale(1.04); } 70%{ transform:translateY(0) scale(.98); } 100%{ transform:translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce){
+    #book-art, #book-halo, .twinkle, .steam, .avatar{ animation:none !important; }
+  }
+
+  /* ---------- Views (open on top of the library) ---------- */
+  .view{
+    display:none; position:absolute; inset:0; z-index:20;
+    flex-direction:column; min-height:0; background:var(--paper);
+  }
   .view.active{ display:flex; }
+  #view-chat.active{ animation:bookOpen .55s cubic-bezier(.2,.8,.2,1) backwards; transform-origin:left center; }
+  @keyframes bookOpen{
+    from{ opacity:0; transform:perspective(1000px) rotateY(-75deg) scale(.85); }
+    to{ opacity:1; transform:perspective(1000px) rotateY(0) scale(1); }
+  }
+  #view-planner.active{ animation:tableZoom .45s cubic-bezier(.2,.8,.2,1) backwards; transform-origin:50% 100%; }
+  @keyframes tableZoom{
+    from{ opacity:0; transform:scale(.78) translateY(50px); }
+    to{ opacity:1; transform:scale(1) translateY(0); }
+  }
 
-  /* Chat */
+  .view-bar{ display:flex; align-items:center; gap:10px; padding:10px 14px; flex:none; color:var(--paper); }
+  .book-bar{ background:#2F5FB8; border-bottom:3px solid #E0B34A; }
+  .table-bar{ background:#6B4430; border-bottom:3px solid #3E2619; }
+  .back-btn{
+    border:none; background:rgba(255,248,237,.18); color:inherit;
+    font-family:'Baloo 2', sans-serif; font-size:13px; padding:6px 12px; border-radius:10px; cursor:pointer;
+    transition:background .15s ease;
+  }
+  .back-btn:hover{ background:rgba(255,248,237,.3); }
+  .view-title{ font-family:'Baloo 2', sans-serif; font-size:15px; }
+
+  /* Chat (unchanged) */
   .chat-scroll{
     flex:1; overflow-y:auto; padding:18px 16px; display:flex; flex-direction:column; gap:10px;
     background: repeating-linear-gradient(transparent, transparent 27px, var(--line) 28px);
@@ -193,8 +247,23 @@
   .send-btn:hover{ transform:scale(1.06) rotate(-4deg); }
   .send-btn:active{ transform:scale(.94); }
 
-  /* Planner */
-  .planner{ padding:16px; overflow-y:auto; flex:1; }
+  /* Planner: top-down view of the table, with a clipboard on it */
+  #view-planner{
+    background:repeating-linear-gradient(90deg, #A9714B 0 46px, #9C6642 46px 48px);
+  }
+  .clipboard{
+    position:relative; flex:1; min-height:0; margin:24px 16px 16px;
+    background:#8B5A3C; padding:22px 10px 10px; border-radius:12px;
+    display:flex; flex-direction:column;
+    box-shadow:0 12px 24px rgba(0,0,0,.35);
+  }
+  .clip{
+    position:absolute; top:-10px; left:50%; width:96px; height:26px; margin-left:-48px; z-index:2;
+    background:linear-gradient(#D5D9DC,#9AA0A5); border-radius:7px;
+    box-shadow:0 3px 0 rgba(0,0,0,.25);
+  }
+  .clip::after{ content:''; position:absolute; left:50%; top:7px; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:#6B4430; }
+  .planner{ padding:16px; overflow-y:auto; flex:1; min-height:0; background:var(--paper); border-radius:4px; }
   .date-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
   .date-nav button{ border:none; background:var(--paper-soft); border:1px solid var(--line); width:34px; height:34px; border-radius:10px; cursor:pointer; font-size:14px; }
   .date-label{ text-align:center; }
@@ -300,51 +369,270 @@
       </div>
     </div>
 
-    <div class="tabs">
-      <button class="tab-btn active" id="tab-chat-btn" onclick="switchTab('chat')">💬 Chat</button>
-      <button class="tab-btn" id="tab-plan-btn" onclick="switchTab('planner')">📋 To-Do</button>
-    </div>
+    <!-- THE LIBRARY -->
+    <div class="stage" id="stage">
 
-    <!-- CHAT VIEW -->
-    <div class="view active" id="view-chat">
-      <div class="chat-scroll" id="chat-scroll">
-        <div class="empty-state" id="chat-empty">
-          <span class="emoji">🐾💬</span>
-          Nothing said yet. Say hi first!
+      <svg id="library-scene" viewBox="0 0 400 500" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="A cosy library. The blue book on the shelf opens the chat. The study table opens the to-do list.">
+        <defs>
+          <linearGradient id="wallGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="372">
+            <stop offset="0" stop-color="#6B4430"/><stop offset="1" stop-color="#4F3224"/>
+          </linearGradient>
+          <linearGradient id="floorGrad" gradientUnits="userSpaceOnUse" x1="0" y1="372" x2="0" y2="500">
+            <stop offset="0" stop-color="#B07A50"/><stop offset="1" stop-color="#86563A"/>
+          </linearGradient>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1B2547"/><stop offset="1" stop-color="#3A4F86"/>
+          </linearGradient>
+          <radialGradient id="haloGrad">
+            <stop offset="0" stop-color="#FFE9A0" stop-opacity=".95"/><stop offset="1" stop-color="#FFE9A0" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="lampGlow">
+            <stop offset="0" stop-color="#FFD98A" stop-opacity=".55"/><stop offset="1" stop-color="#FFD98A" stop-opacity="0"/>
+          </radialGradient>
+          <mask id="moonMask">
+            <rect x="0" y="0" width="400" height="500" fill="#fff"/>
+            <circle cx="226" cy="67" r="11" fill="#000"/>
+          </mask>
+        </defs>
+
+        <!-- Wall, wainscot, floor -->
+        <rect x="-400" y="-800" width="1200" height="1172" fill="url(#wallGrad)"/>
+        <rect x="-400" y="300" width="1200" height="72" fill="#432A1E"/>
+        <rect x="-400" y="298" width="1200" height="5" fill="#7B4B30"/>
+        <rect x="-400" y="364" width="1200" height="8" fill="#3E2619"/>
+        <rect x="-400" y="372" width="1200" height="400" fill="url(#floorGrad)"/>
+        <g stroke="#7A4C2F" stroke-opacity=".35" stroke-width="1.5">
+          <line x1="-400" x2="800" y1="392" y2="392"/>
+          <line x1="-400" x2="800" y1="416" y2="416"/>
+          <line x1="-400" x2="800" y1="446" y2="446"/>
+          <line x1="-400" x2="800" y1="482" y2="482"/>
+        </g>
+
+        <!-- Window with night sky -->
+        <path d="M156 160 V84 A44 44 0 0 1 244 84 V160 Z" fill="url(#skyGrad)"/>
+        <circle cx="218" cy="72" r="12" fill="#FFF1C2" mask="url(#moonMask)"/>
+        <g fill="#FFFFFF">
+          <circle class="twinkle" cx="178" cy="70" r="1.4"/>
+          <circle class="twinkle" style="animation-delay:-1s" cx="190" cy="52" r="1.2"/>
+          <circle class="twinkle" style="animation-delay:-2s" cx="176" cy="112" r="1.3"/>
+          <circle class="twinkle" style="animation-delay:-.5s" cx="208" cy="124" r="1.2"/>
+          <circle class="twinkle" style="animation-delay:-1.5s" cx="232" cy="104" r="1.3"/>
+          <circle cx="168" cy="138" r="1"/>
+        </g>
+        <path d="M156 160 V84 A44 44 0 0 1 244 84 V160 Z" fill="none" stroke="#8B5A3C" stroke-width="6" stroke-linejoin="round"/>
+        <line x1="200" y1="40" x2="200" y2="160" stroke="#8B5A3C" stroke-width="3"/>
+        <line x1="156" y1="104" x2="244" y2="104" stroke="#8B5A3C" stroke-width="3"/>
+        <rect x="148" y="160" width="104" height="8" rx="2" fill="#8B5A3C"/>
+        <rect x="146" y="50" width="12" height="118" rx="5" fill="#8C3B3B"/>
+        <rect x="242" y="50" width="12" height="118" rx="5" fill="#8C3B3B"/>
+
+        <!-- LEFT BOOKSHELF -->
+        <rect x="14" y="36" width="124" height="336" fill="#7B4B30" stroke="#3E2619" stroke-width="3"/>
+        <rect x="22" y="44" width="108" height="216" fill="#3A2318"/>
+        <rect x="10" y="30" width="132" height="8" rx="2" fill="#8B5A3C"/>
+        <g fill="#8B5A3C">
+          <rect x="18" y="110" width="116" height="6"/>
+          <rect x="18" y="182" width="116" height="6"/>
+          <rect x="18" y="254" width="116" height="6"/>
+        </g>
+        <rect x="22" y="260" width="108" height="108" fill="#5E3825" stroke="#3E2619" stroke-width="2"/>
+        <line x1="76" y1="262" x2="76" y2="366" stroke="#3E2619" stroke-width="2"/>
+        <rect x="28" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
+        <rect x="82" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
+        <circle cx="70" cy="314" r="3" fill="#E0B34A"/><circle cx="82" cy="314" r="3" fill="#E0B34A"/>
+        <g id="books-left"></g>
+        <!-- plant on top -->
+        <rect x="50" y="16" width="20" height="14" rx="3" fill="#C96A5A"/>
+        <g fill="#5E8B5E">
+          <ellipse cx="54" cy="10" rx="4" ry="10" transform="rotate(-25 54 10)"/>
+          <ellipse cx="66" cy="10" rx="4" ry="10" transform="rotate(25 66 10)"/>
+          <ellipse cx="60" cy="7" rx="4" ry="10"/>
+        </g>
+
+        <!-- RIGHT BOOKSHELF -->
+        <rect x="262" y="36" width="124" height="336" fill="#7B4B30" stroke="#3E2619" stroke-width="3"/>
+        <rect x="270" y="44" width="108" height="216" fill="#3A2318"/>
+        <rect x="258" y="30" width="132" height="8" rx="2" fill="#8B5A3C"/>
+        <g fill="#8B5A3C">
+          <rect x="266" y="110" width="116" height="6"/>
+          <rect x="266" y="182" width="116" height="6"/>
+          <rect x="266" y="254" width="116" height="6"/>
+        </g>
+        <rect x="270" y="260" width="108" height="108" fill="#5E3825" stroke="#3E2619" stroke-width="2"/>
+        <line x1="324" y1="262" x2="324" y2="366" stroke="#3E2619" stroke-width="2"/>
+        <rect x="276" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
+        <rect x="330" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
+        <circle cx="318" cy="314" r="3" fill="#E0B34A"/><circle cx="330" cy="314" r="3" fill="#E0B34A"/>
+        <g id="books-right"></g>
+        <!-- stack of books on top -->
+        <rect x="300" y="22" width="44" height="8" rx="1.5" fill="#3F7D7A"/>
+        <rect x="306" y="14" width="34" height="8" rx="1.5" fill="#D9A441"/>
+        <rect x="302" y="6" width="38" height="8" rx="1.5" fill="#8C3B3B"/>
+
+        <!-- THE BLUE BOOK (opens the chat) -->
+        <g id="book-hot" class="hot" role="button" tabindex="0" data-open="chat" aria-label="Open the blue book to chat">
+          <rect x="290" y="108" width="76" height="102" fill="transparent"/>
+          <g class="lift">
+            <circle id="book-halo" cx="328" cy="150" r="38" fill="url(#haloGrad)"/>
+            <g id="book-art">
+              <g transform="rotate(-9 318 182)">
+                <rect x="312" y="124" width="30" height="58" rx="3" fill="#2F6FDE" stroke="#1B3F8F" stroke-width="2"/>
+                <rect x="312" y="124" width="7" height="58" rx="3" fill="#1B3F8F"/>
+                <rect x="322" y="132" width="16" height="2.5" fill="#E0B34A"/>
+                <rect x="322" y="170" width="16" height="2.5" fill="#E0B34A"/>
+                <text x="330" y="156" text-anchor="middle" font-size="13">💬</text>
+              </g>
+            </g>
+            <g id="book-badge" style="display:none">
+              <circle cx="346" cy="124" r="9" fill="#C96A5A" stroke="#FFF8ED" stroke-width="2"/>
+              <text id="book-badge-n" class="mono" x="346" y="127.5" text-anchor="middle" font-size="10" fill="#fff">1</text>
+            </g>
+            <rect x="294" y="190" width="62" height="18" rx="9" fill="#FFF8ED" stroke="#E7D8BE"/>
+            <text x="325" y="203" text-anchor="middle" font-size="10.5" fill="#2E2620">💬 Chat</text>
+          </g>
+        </g>
+
+        <!-- Rug and floor shadow -->
+        <ellipse cx="200" cy="462" rx="178" ry="28" fill="#8C3B3B"/>
+        <ellipse cx="200" cy="462" rx="164" ry="23" fill="none" stroke="#D9A441" stroke-width="2" stroke-dasharray="6 4"/>
+        <ellipse cx="200" cy="488" rx="176" ry="9" fill="#000" opacity=".22"/>
+
+        <!-- DOG (left chair) -->
+        <g id="av-dog" class="avatar" onclick="hop('dog')">
+          <rect x="65" y="296" width="80" height="100" rx="16" fill="#6B3F2A" stroke="#3E2619" stroke-width="3"/>
+          <rect x="73" y="304" width="64" height="84" rx="10" fill="#7B4B30"/>
+          <g class="av-in">
+            <ellipse cx="105" cy="392" rx="38" ry="36" fill="#ED8546"/>
+            <circle cx="105" cy="326" r="34" fill="#FBDAC0" stroke="#fff" stroke-width="2"/>
+            <text x="105" y="341" text-anchor="middle" font-size="44">🐶</text>
+          </g>
+          <g id="you-dog" style="display:none">
+            <rect x="89" y="268" width="32" height="14" rx="7" fill="#FFF8ED" stroke="#E7D8BE"/>
+            <path d="M101 282 l4 6 l4 -6 z" fill="#FFF8ED"/>
+            <text class="mono" x="105" y="278.5" text-anchor="middle" font-size="9" fill="#2E2620">you</text>
+          </g>
+        </g>
+
+        <!-- CAT (right chair) -->
+        <g id="av-cat" class="avatar" onclick="hop('cat')">
+          <rect x="255" y="296" width="80" height="100" rx="16" fill="#6B3F2A" stroke="#3E2619" stroke-width="3"/>
+          <rect x="263" y="304" width="64" height="84" rx="10" fill="#7B4B30"/>
+          <g class="av-in">
+            <ellipse cx="295" cy="392" rx="38" ry="36" fill="#5B2C82"/>
+            <circle cx="295" cy="326" r="34" fill="#E6D7F2" stroke="#fff" stroke-width="2"/>
+            <text x="295" y="341" text-anchor="middle" font-size="44">🐱</text>
+          </g>
+          <g id="you-cat" style="display:none">
+            <rect x="279" y="268" width="32" height="14" rx="7" fill="#FFF8ED" stroke="#E7D8BE"/>
+            <path d="M291 282 l4 6 l4 -6 z" fill="#FFF8ED"/>
+            <text class="mono" x="295" y="278.5" text-anchor="middle" font-size="9" fill="#2E2620">you</text>
+          </g>
+        </g>
+
+        <!-- THE STUDY TABLE (opens the to-do list) -->
+        <g id="table-hot" class="hot" role="button" tabindex="0" data-open="planner" aria-label="Open the study table to-do list">
+          <rect x="20" y="376" width="360" height="114" fill="transparent"/>
+          <g class="lift">
+            <!-- legs -->
+            <rect x="72" y="426" width="10" height="36" fill="#55321F"/>
+            <rect x="318" y="426" width="10" height="36" fill="#55321F"/>
+            <rect x="38" y="438" width="14" height="48" rx="2" fill="#6B3F2A" stroke="#3E2619" stroke-width="1.5"/>
+            <rect x="348" y="438" width="14" height="48" rx="2" fill="#6B3F2A" stroke="#3E2619" stroke-width="1.5"/>
+            <!-- apron -->
+            <rect x="26" y="426" width="348" height="14" rx="3" fill="#7B4B30" stroke="#3E2619" stroke-width="2"/>
+            <!-- top -->
+            <polygon points="56,380 344,380 376,426 24,426" fill="#C98E5B" stroke="#3E2619" stroke-width="2" stroke-linejoin="round"/>
+            <polygon points="56,380 344,380 350,388 50,388" fill="#D9A06C"/>
+            <!-- lamp -->
+            <polygon points="322,396 352,396 368,424 306,424" fill="#FFD98A" opacity=".2"/>
+            <circle cx="334" cy="392" r="42" fill="url(#lampGlow)"/>
+            <ellipse cx="334" cy="412" rx="14" ry="4" fill="#2F5D4A"/>
+            <rect x="332" y="392" width="4" height="20" fill="#2F5D4A"/>
+            <path d="M320 392 L326 374 L342 374 L348 392 Z" fill="#3F7D6A" stroke="#2F5D4A" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- mug -->
+            <rect x="68" y="398" width="16" height="16" rx="3" fill="#EFE0BF" stroke="#3E2619" stroke-width="1.5"/>
+            <path d="M84 402 q7 0 7 6 q0 6 -7 6" fill="none" stroke="#EFE0BF" stroke-width="2.5"/>
+            <path class="steam" d="M73 394 q3 -4 0 -8" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            <path class="steam" style="animation-delay:-1.2s" d="M79 394 q3 -4 0 -8" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- little book stack -->
+            <rect x="262" y="408" width="34" height="7" rx="1" fill="#3F7D7A"/>
+            <rect x="266" y="401" width="28" height="7" rx="1" fill="#D9A441"/>
+            <!-- to-do notepad -->
+            <polygon points="168,392 232,392 240,420 160,420" fill="#FFF8ED" stroke="#D8C7A5" stroke-width="1"/>
+            <path d="M173 399.5 l2.5 2.5 l5 -5" fill="none" stroke="#7CA588" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="186" y1="399" x2="226" y2="399" stroke="#C9B48F"/>
+            <rect x="171" y="404" width="5" height="5" fill="none" stroke="#C9B48F"/>
+            <line x1="184" y1="407" x2="228" y2="407" stroke="#C9B48F"/>
+            <rect x="169" y="411" width="5" height="5" fill="none" stroke="#C9B48F"/>
+            <line x1="182" y1="414" x2="230" y2="414" stroke="#C9B48F"/>
+            <rect x="236" y="402" width="26" height="4" rx="1" fill="#D9A441" transform="rotate(18 236 402)"/>
+            <!-- name plates -->
+            <text id="svg-name-dog" x="105" y="437" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FFF8ED">Pup</text>
+            <text id="svg-name-cat" x="295" y="437" text-anchor="middle" font-size="9.5" font-weight="600" fill="#FFF8ED">Kitty</text>
+            <!-- label -->
+            <rect x="148" y="454" width="104" height="22" rx="11" fill="#FFF8ED" stroke="#E7D8BE"/>
+            <text x="200" y="469" text-anchor="middle" font-size="11" fill="#2E2620">📋 To-Do list</text>
+            <g id="table-badge" style="display:none">
+              <circle cx="250" cy="455" r="9" fill="#C96A5A" stroke="#FFF8ED" stroke-width="2"/>
+              <text id="table-badge-n" class="mono" x="250" y="458.5" text-anchor="middle" font-size="10" fill="#fff">1</text>
+            </g>
+          </g>
+        </g>
+      </svg>
+
+      <!-- CHAT VIEW (the blue book) — the chatbox itself is unchanged -->
+      <div class="view" id="view-chat">
+        <div class="view-bar book-bar">
+          <button class="back-btn" onclick="closeView()">← Library</button>
+          <span class="view-title">📘 Our blue book</span>
         </div>
-      </div>
-      <div class="compose">
-        <input type="text" id="chat-input" placeholder="Type something sweet…" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage()">
-        <button class="send-btn" onclick="sendMessage()">➤</button>
-      </div>
-    </div>
-
-    <!-- PLANNER VIEW -->
-    <div class="view" id="view-planner">
-      <div class="planner">
-        <div class="date-nav">
-          <button onclick="shiftDate(-1)">◀</button>
-          <div class="date-label">
-            <div class="day" id="date-day">—</div>
-            <div class="today-pill" id="date-today-pill"></div>
+        <div class="chat-scroll" id="chat-scroll">
+          <div class="empty-state" id="chat-empty">
+            <span class="emoji">🐾💬</span>
+            Nothing said yet. Say hi first!
           </div>
-          <button onclick="shiftDate(1)">▶</button>
         </div>
-
-        <div class="add-form">
-          <input type="time" id="new-time" value="09:00">
-          <input type="text" id="new-title" placeholder="What's happening?" maxlength="80">
-          <div class="who-row" id="who-row">
-            <div class="who-chip" data-who="dog" onclick="pickWho('dog')">🐶 Pup</div>
-            <div class="who-chip" data-who="cat" onclick="pickWho('cat')">🐱 Cat</div>
-            <div class="who-chip sel-both" data-who="both" onclick="pickWho('both')">🐾 Both</div>
-          </div>
-          <button class="add-btn" onclick="addTask()">+ Add to today</button>
+        <div class="compose">
+          <input type="text" id="chat-input" placeholder="Type something sweet…" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage()">
+          <button class="send-btn" onclick="sendMessage()">➤</button>
         </div>
-
-        <div class="list-heading">To-Do List</div>
-        <div class="task-list" id="task-list"></div>
       </div>
+
+      <!-- PLANNER VIEW (the study table) -->
+      <div class="view" id="view-planner">
+        <div class="view-bar table-bar">
+          <button class="back-btn" onclick="closeView()">← Library</button>
+          <span class="view-title">🪑 Study table</span>
+        </div>
+        <div class="clipboard">
+          <div class="clip"></div>
+          <div class="planner">
+            <div class="date-nav">
+              <button onclick="shiftDate(-1)">◀</button>
+              <div class="date-label">
+                <div class="day" id="date-day">—</div>
+                <div class="today-pill" id="date-today-pill"></div>
+              </div>
+              <button onclick="shiftDate(1)">▶</button>
+            </div>
+
+            <div class="add-form">
+              <input type="time" id="new-time" value="09:00">
+              <input type="text" id="new-title" placeholder="What's happening?" maxlength="80">
+              <div class="who-row" id="who-row">
+                <div class="who-chip" data-who="dog" onclick="pickWho('dog')">🐶 Pup</div>
+                <div class="who-chip" data-who="cat" onclick="pickWho('cat')">🐱 Cat</div>
+                <div class="who-chip sel-both" data-who="both" onclick="pickWho('both')">🐾 Both</div>
+              </div>
+              <button class="add-btn" onclick="addTask()">+ Add to today</button>
+            </div>
+
+            <div class="list-heading">To-Do List</div>
+            <div class="task-list" id="task-list"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -373,6 +661,8 @@
   let currentDate = new Date();
   let pickedWho = 'both';
   let plannerRef = null;
+  let openName = null;       // 'chat' | 'planner' | null (library)
+  let lastSeenTime = 0;      // newest chat message you've seen
 
   function escapeHtml(str){
     const d = document.createElement('div');
@@ -396,6 +686,39 @@
     if(!s) s = 'our-room';
     return s.slice(0, 60);
   }
+
+  // ---------- library books (decorative) ----------
+  (function buildBooks(){
+    const NS = 'http://www.w3.org/2000/svg';
+    const colors = ['#C96A5A','#3F7D7A','#D9A441','#5E8B5E','#EFE0BF','#8E5A86','#8C3B3B','#8A8F4F','#D99A9A','#B5651D'];
+    let seed = 11;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    function el(name, attrs, parent){
+      const e = document.createElementNS(NS, name);
+      for(const k in attrs) e.setAttribute(k, attrs[k]);
+      parent.appendChild(e);
+      return e;
+    }
+    function fillRow(g, x0, x1, base, skip){
+      let x = x0;
+      while(x < x1 - 8){
+        const w = Math.round(8 + rnd() * 8);
+        if(skip && x < skip[1] && x + w > skip[0]){ x = skip[1]; continue; }
+        if(x + w > x1) break;
+        const h = Math.round(36 + rnd() * 22);
+        const c = colors[Math.floor(rnd() * colors.length)];
+        const b = el('g', {}, g);
+        el('rect', { x:x, y:base-h, width:w, height:h, rx:1.5, fill:c, stroke:'rgba(0,0,0,.28)', 'stroke-width':.8 }, b);
+        el('rect', { x:x, y:base-h+5, width:w, height:2.5, fill:'rgba(255,255,255,.35)' }, b);
+        el('rect', { x:x, y:base-10, width:w, height:2.5, fill:'rgba(0,0,0,.2)' }, b);
+        x += w + (rnd() < 0.15 ? 6 + rnd() * 6 : 0.8);
+      }
+    }
+    const left = document.getElementById('books-left');
+    const right = document.getElementById('books-right');
+    [110, 182, 254].forEach(base => fillRow(left, 24, 128, base, null));
+    [110, 182, 254].forEach(base => fillRow(right, 272, 376, base, base === 182 ? [298, 356] : null));
+  })();
 
   // ---------- toast ----------
   function showToast(text){
@@ -483,6 +806,7 @@
   function showMain(){
     document.getElementById('main').style.display = 'flex';
     document.getElementById('room-badge').innerText = '#' + roomId;
+    loadSeen();
     attachProfileListener();
     attachMessagesListener();
     attachPlannerListener();
@@ -504,7 +828,18 @@
     document.getElementById('edit-dog').style.display = myRole === 'dog' ? 'inline' : 'none';
     document.getElementById('edit-cat').style.display = myRole === 'cat' ? 'inline' : 'none';
 
+    // library scene: name plates, "you" marker
+    document.getElementById('svg-name-dog').textContent = profiles.dog.name;
+    document.getElementById('svg-name-cat').textContent = profiles.cat.name;
+    document.getElementById('you-dog').style.display = myRole === 'dog' ? '' : 'none';
+    document.getElementById('you-cat').style.display = myRole === 'cat' ? '' : 'none';
+
     const undone = tasks.filter(t => !t.done && (t.who === myRole || t.who === 'both')).length;
+
+    // library scene: to-do count on the table
+    document.getElementById('table-badge').style.display = undone > 0 ? '' : 'none';
+    document.getElementById('table-badge-n').textContent = undone > 9 ? '9+' : String(undone);
+
     const g = document.getElementById('greeting');
     if(tasks.length === 0){
       g.innerText = "🐾 Nothing planned yet — add the first thing you're doing today.";
@@ -526,16 +861,80 @@
     }catch(e){ showToast('⚠️ Could not save — try again'); }
   }
 
-  // ---------- tabs ----------
-  function switchTab(tab){
-    document.getElementById('tab-chat-btn').classList.toggle('active', tab==='chat');
-    document.getElementById('tab-plan-btn').classList.toggle('active', tab==='planner');
-    document.getElementById('view-chat').classList.toggle('active', tab==='chat');
-    document.getElementById('view-planner').classList.toggle('active', tab==='planner');
-    if(tab==='chat'){
+  // ---------- library navigation ----------
+  function openView(name){
+    const chat = name === 'chat';
+    openName = name;
+    document.getElementById('view-chat').classList.toggle('active', chat);
+    document.getElementById('view-planner').classList.toggle('active', !chat);
+    if(chat){
+      markChatSeen();
       const sc = document.getElementById('chat-scroll');
       setTimeout(()=>{ sc.scrollTop = sc.scrollHeight; }, 30);
     }
+  }
+
+  function closeView(){
+    if(openName === 'chat') markChatSeen();
+    openName = null;
+    document.getElementById('view-chat').classList.remove('active');
+    document.getElementById('view-planner').classList.remove('active');
+    // always come back to today's plans
+    if(!isSameDay(currentDate, new Date())){
+      currentDate = new Date();
+      renderDateLabel();
+      attachPlannerListener();
+    }
+  }
+
+  document.querySelectorAll('.hot').forEach(el => {
+    const target = el.getAttribute('data-open');
+    el.addEventListener('click', () => openView(target));
+    el.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openView(target); }
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && openName) closeView();
+  });
+
+  function hop(role){
+    const el = document.querySelector('#av-'+role+' .av-in');
+    if(el){
+      el.classList.remove('hop');
+      void el.getBoundingClientRect();
+      el.classList.add('hop');
+    }
+    showToast(role === 'dog' ? '🐶 woof!' : '🐱 meow~');
+  }
+
+  // ---------- unread badge on the blue book ----------
+  async function loadSeen(){
+    try{
+      const r = await window.storage.get('chat-seen-'+roomId, false);
+      lastSeenTime = (r && r.value) ? Number(r.value) : Date.now();
+    }catch(e){
+      lastSeenTime = Date.now();
+    }
+    updateBookBadge();
+  }
+
+  function markChatSeen(){
+    if(messages.length){
+      lastSeenTime = Math.max(lastSeenTime, ...messages.map(m => m.time || 0));
+    }
+    Promise.resolve()
+      .then(() => window.storage.set('chat-seen-'+roomId, String(lastSeenTime), false))
+      .catch(() => {});
+    updateBookBadge();
+  }
+
+  function updateBookBadge(){
+    const n = openName === 'chat'
+      ? 0
+      : messages.filter(m => m.sender !== myRole && (m.time || 0) > lastSeenTime).length;
+    document.getElementById('book-badge').style.display = n > 0 ? '' : 'none';
+    document.getElementById('book-badge-n').textContent = n > 9 ? '9+' : String(n);
   }
 
   // ---------- chat ----------
@@ -545,6 +944,7 @@
       snap.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
       messages = arr;
       renderMessages();
+      if(openName === 'chat') markChatSeen(); else updateBookBadge();
     });
   }
 
