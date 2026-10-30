@@ -7,6 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 
+<!-- Pick the theme before anything paints (saved choice, else the device setting) -->
+<script>
+  (function(){
+    var t = null;
+    try{ t = localStorage.getItem('paws:theme'); }catch(e){}
+    if(t !== 'dark' && t !== 'light'){
+      t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+
 <!-- Firebase (compat SDK, works with plain <script> tags) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -18,6 +30,11 @@
     --dog:#ED8546; --dog-soft:#FBDAC0; --cat:#5B2C82; --cat-soft:#E6D7F2;
     --line:#E7D8BE; --good:#7CA588; --bad:#C96A5A; --shadow: 0 10px 30px rgba(46,38,32,0.16);
   }
+  [data-theme="dark"]{
+    --paper:#231D19; --paper-soft:#2D2621; --ink:#F3E9D8; --ink-soft:#A99A8A;
+    --dog-soft:#6B4128; --cat-soft:#44305E;
+    --line:#43392F; --good:#6FA07E; --bad:#D9806F; --shadow: 0 10px 34px rgba(0,0,0,0.55);
+  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
@@ -25,6 +42,10 @@
     background: radial-gradient(circle at 15% 10%, #EFE0BF 0%, transparent 45%), radial-gradient(circle at 85% 90%, #E4D3AE 0%, transparent 45%), #D9C7A0;
     font-family:'Nunito', sans-serif; color:var(--ink);
     display:flex; justify-content:center; padding:24px 12px;
+    transition:background .3s ease;
+  }
+  [data-theme="dark"] body{
+    background: radial-gradient(circle at 15% 10%, #2D2218 0%, transparent 45%), radial-gradient(circle at 85% 90%, #1E1611 0%, transparent 45%), #15100D;
   }
   .card{
     width:100%; max-width:460px; background:var(--paper); border-radius:28px; box-shadow:var(--shadow);
@@ -34,6 +55,11 @@
     animation:cardIn .5s cubic-bezier(.2,.8,.2,1);
   }
   @keyframes cardIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---------- Little animal faces (used instead of emoji) ---------- */
+  .face{ display:block; overflow:visible; }
+  .eye{ transform-box:fill-box; transform-origin:center; animation:blink 4.6s infinite; }
+  @keyframes blink{ 0%,93%,100%{ transform:scaleY(1); } 96%{ transform:scaleY(.1); } }
 
   /* ---------- Gate-style screens ---------- */
   .gate{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 28px; text-align:center; gap:18px; }
@@ -47,7 +73,7 @@
     font-family:'Baloo 2', sans-serif; font-size:15px; color:var(--ink);
     transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
   }
-  .role-btn .emoji{ font-size:34px; }
+  .role-btn .face{ width:62px; height:62px; }
   .role-btn:hover{ transform:translateY(-3px) rotate(-1deg); box-shadow:0 8px 18px rgba(46,38,32,.14); }
   .role-btn.dog:hover{ border-color:var(--dog); }
   .role-btn.cat:hover{ border-color:var(--cat); }
@@ -57,13 +83,16 @@
   .primary-btn{ border:none; background:var(--ink); color:var(--paper); font-family:'Baloo 2',sans-serif; font-size:14px; padding:12px 30px; border-radius:14px; cursor:pointer; transition:transform .15s ease; }
   .primary-btn:hover{ transform:translateY(-2px); }
   .primary-btn:active{ transform:translateY(0) scale(.97); }
+  .remember{ display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-soft); cursor:pointer; }
+  .remember input{ accent-color:var(--ink); }
 
   /* ---------- Header ---------- */
   .header{ padding:18px 20px 10px; border-bottom:1px solid var(--line); background:var(--paper); flex:none; }
   .pair-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .profile{ display:flex; align-items:center; gap:10px; }
   .profile.right{ flex-direction:row-reverse; text-align:right; }
-  .tag{ width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 3px 0 rgba(0,0,0,0.14); position:relative; flex:none; transform:rotate(-4deg); }
+  .tag{ width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.14); position:relative; flex:none; transform:rotate(-4deg); }
+  .tag .face{ width:38px; height:38px; margin-top:2px; }
   .profile.right .tag{ transform:rotate(4deg); }
   .tag::before{ content:''; position:absolute; top:-5px; left:9px; width:8px; height:8px; border-radius:50%; background:#fff; border:3px solid var(--ink); }
   .profile.right .tag::before{ left:auto; right:9px; }
@@ -78,45 +107,64 @@
   .role-label{ font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; font-family:'IBM Plex Mono', monospace; }
   .heart{ font-size:16px; color:var(--ink-soft); }
   .greeting{ margin-top:12px; font-size:13px; color:var(--ink-soft); }
-  .meta-row{ margin-top:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--ink-soft); }
-  .room-badge{ font-family:'IBM Plex Mono', monospace; }
+  .meta-row{ margin-top:8px; display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:11px; color:var(--ink-soft); }
+  .book-count{ font-family:'IBM Plex Mono', monospace; }
   .switch-link{ text-decoration:underline; cursor:pointer; }
   .switch-link:hover{ color:var(--ink); }
+  .theme-btn{ border:1px solid var(--line); background:var(--paper-soft); color:var(--ink); border-radius:10px; font-family:'IBM Plex Mono', monospace; font-size:11px; padding:3px 9px; cursor:pointer; }
+  .theme-btn:hover{ border-color:var(--ink-soft); }
 
   /* ---------- Library stage ---------- */
   .stage{ position:relative; flex:1; min-height:0; overflow:hidden; background:#4F3224; }
-  #library-scene{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:manipulation; }
+  .scene-wrap{ position:absolute; inset:0; }
+  #library-scene{ width:100%; height:100%; display:block; touch-action:manipulation; }
   #library-scene text{ font-family:'Baloo 2','Nunito',sans-serif; user-select:none; -webkit-user-select:none; }
   #library-scene .mono{ font-family:'IBM Plex Mono', monospace; }
+  #night{ transition:opacity .45s ease; pointer-events:none; }
+  [data-theme="dark"] #night{ opacity:.5; }
+  .lamp-glow{ opacity:.8; transition:opacity .45s ease; }
+  [data-theme="dark"] .lamp-glow{ opacity:1; }
 
   .hot{ cursor:pointer; outline:none; -webkit-tap-highlight-color:transparent; }
   .hot .lift{ transition:transform .2s ease, filter .2s ease; transform-box:fill-box; transform-origin:50% 100%; }
   .hot:hover .lift, .hot:focus-visible .lift{ transform:scale(1.04); filter:brightness(1.12); }
-  #book-hot:hover .lift, #book-hot:focus-visible .lift{ transform:translateY(-3px) scale(1.08); }
+  #book-hot:hover .lift, #book-hot:focus-visible .lift{ transform:translateY(-3px) scale(1.12); }
   .hot:active .lift{ transform:scale(.99); }
+
+  .book-pop{ transform-box:fill-box; transform-origin:50% 100%; animation:bookPop .6s cubic-bezier(.2,1.4,.4,1) backwards; }
+  @keyframes bookPop{ from{ opacity:0; transform:translateY(-28px) scale(.4); } to{ opacity:1; transform:translateY(0) scale(1); } }
 
   .twinkle{ animation:twinkle 3s ease-in-out infinite; }
   @keyframes twinkle{ 0%,100%{ opacity:.35; } 50%{ opacity:1; } }
   .steam{ animation:steam 2.4s ease-in-out infinite; }
   @keyframes steam{ 0%,100%{ opacity:.15; transform:translateY(0); } 50%{ opacity:.6; transform:translateY(-3px); } }
 
+  /* ---------- Walking avatars ---------- */
   .avatar{ cursor:pointer; }
   .av-in{ transform-box:fill-box; transform-origin:50% 100%; animation:idle 3.4s ease-in-out infinite; }
   #av-cat .av-in{ animation-delay:-1.7s; }
-  @keyframes idle{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-2px); } }
+  @keyframes idle{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-1.5px); } }
   .av-in.hop{ animation:hop .5s ease; }
   @keyframes hop{ 0%{ transform:translateY(0); } 35%{ transform:translateY(-12px) scale(1.04); } 70%{ transform:translateY(0) scale(.98); } 100%{ transform:translateY(0); } }
-  .avatar.walking .av-in{ animation:walk .34s ease-in-out infinite; }
-  @keyframes walk{ 0%,100%{ transform:rotate(-6deg) translateY(0); } 50%{ transform:rotate(6deg) translateY(-4px); } }
+  .avatar.walking .av-in{ animation:walk .36s ease-in-out infinite; }
+  @keyframes walk{ 0%,100%{ transform:rotate(-4deg) translateY(0); } 50%{ transform:rotate(4deg) translateY(-3px); } }
+  .tail{ transform-box:fill-box; transform-origin:0% 100%; animation:wag 1.4s ease-in-out infinite; }
+  .avatar.walking .tail{ animation-duration:.45s; }
+  @keyframes wag{ 0%,100%{ transform:rotate(-9deg); } 50%{ transform:rotate(15deg); } }
+  .leg, .arm{ transform-box:fill-box; transform-origin:50% 0%; }
+  .avatar.walking .leg-l, .avatar.walking .arm-r{ animation:swingA .36s ease-in-out infinite; }
+  .avatar.walking .leg-r, .avatar.walking .arm-l{ animation:swingB .36s ease-in-out infinite; }
+  @keyframes swingA{ 0%,100%{ transform:rotate(-24deg); } 50%{ transform:rotate(24deg); } }
+  @keyframes swingB{ 0%,100%{ transform:rotate(24deg); } 50%{ transform:rotate(-24deg); } }
   #tap-mark{ pointer-events:none; opacity:0; transform-box:fill-box; transform-origin:center; }
   #tap-mark.ping{ animation:ping .6s ease-out; }
   @keyframes ping{ from{ opacity:.9; transform:scale(.4); } to{ opacity:0; transform:scale(1.8); } }
 
   @media (prefers-reduced-motion: reduce){
-    .twinkle, .steam, .av-in, .avatar.walking .av-in{ animation:none !important; }
+    .twinkle, .steam, .av-in, .tail, .eye, .avatar.walking .av-in, .avatar.walking .leg, .avatar.walking .arm, .book-pop{ animation:none !important; }
   }
 
-  /* ---------- Views (open on top of the library) ---------- */
+  /* ---------- Views (open on top of the library on phones, beside it on desktop) ---------- */
   .view{ display:none; position:absolute; inset:0; z-index:20; flex-direction:column; min-height:0; background:var(--paper); }
   .view.active{ display:flex; }
   #view-chat.active{ animation:bookOpen .55s cubic-bezier(.2,.8,.2,1) backwards; transform-origin:left center; }
@@ -124,47 +172,70 @@
   #view-planner.active{ animation:tableZoom .45s cubic-bezier(.2,.8,.2,1) backwards; transform-origin:50% 100%; }
   @keyframes tableZoom{ from{ opacity:0; transform:scale(.78) translateY(50px); } to{ opacity:1; transform:scale(1) translateY(0); } }
 
-  .view-bar{ display:flex; align-items:center; gap:10px; padding:10px 14px; flex:none; color:var(--paper); }
+  .view-bar{ display:flex; align-items:center; gap:10px; padding:10px 14px; flex:none; color:#FFF8ED; }
   .book-bar{ background:#2F5FB8; border-bottom:3px solid #E0B34A; }
   .table-bar{ background:#6B4430; border-bottom:3px solid #3E2619; }
   .back-btn{ border:none; background:rgba(255,248,237,.18); color:inherit; font-family:'Baloo 2', sans-serif; font-size:13px; padding:6px 12px; border-radius:10px; cursor:pointer; transition:background .15s ease; }
   .back-btn:hover{ background:rgba(255,248,237,.3); }
   .view-title{ font-family:'Baloo 2', sans-serif; font-size:15px; }
+  .push{ margin-left:auto; }
+  .desk-only{ display:none; }
+
+  /* Chat gate */
+  .chat-gate .lock{ font-size:40px; line-height:1; }
 
   /* Chat */
+  .chat-body{ flex:1; min-height:0; display:flex; flex-direction:column; }
+  .chat-tools{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 14px; background:var(--paper-soft); border-bottom:1px solid var(--line); flex:none; }
+  .vanish-toggle{ display:flex; align-items:center; gap:8px; border:none; background:none; cursor:pointer; font-family:'Baloo 2', sans-serif; font-size:13px; color:var(--ink); padding:2px 0; }
+  .sw{ width:36px; height:20px; border-radius:20px; background:var(--line); position:relative; transition:background .2s ease; flex:none; }
+  .sw .knob{ position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .2s ease; }
+  .vanish-toggle.on .sw{ background:var(--good); }
+  .vanish-toggle.on .sw .knob{ transform:translateX(16px); }
+  .partner-state{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--ink-soft); text-align:right; }
   .chat-scroll{ flex:1; overflow-y:auto; padding:18px 16px; display:flex; flex-direction:column; gap:10px; background: repeating-linear-gradient(transparent, transparent 27px, var(--line) 28px); }
   .empty-state{ margin:auto; text-align:center; color:var(--ink-soft); font-size:14px; max-width:220px; }
   .empty-state .emoji{ font-size:30px; display:block; margin-bottom:8px; }
   .msg-row{ display:flex; align-items:flex-end; gap:8px; max-width:88%; animation:popIn .22s ease; }
   .msg-row.me{ align-self:flex-end; flex-direction:row-reverse; }
   @keyframes popIn{ from{opacity:0; transform:scale(.9) translateY(6px);} to{opacity:1; transform:scale(1) translateY(0);} }
-  .mini-tag{ width:26px; height:26px; border-radius:8px; flex:none; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .mini-tag{ width:26px; height:26px; border-radius:8px; flex:none; display:flex; align-items:center; justify-content:center; }
+  .mini-tag .face{ width:23px; height:23px; margin-top:1px; }
   .mini-tag.dog{ background:var(--dog-soft); }
   .mini-tag.cat{ background:var(--cat-soft); }
   .bubble-wrap{ display:flex; align-items:center; gap:4px; }
   .msg-row.me .bubble-wrap{ flex-direction:row-reverse; }
   .bubble{ padding:9px 13px; border-radius:16px; font-size:14.5px; line-height:1.4; word-wrap:break-word; }
+  .bubble.has-img{ padding:5px; }
+  .bubble .cap{ padding:6px 8px 3px; }
+  .chat-img{ display:block; width:min(220px, 56vw); max-width:100%; height:auto; border-radius:11px; cursor:zoom-in; }
   .msg-row.me .bubble{ background:var(--ink); color:var(--paper); border-bottom-right-radius:4px; }
   .msg-row.them .bubble{ background:var(--paper-soft); border:1px solid var(--line); border-bottom-left-radius:4px; }
   .msg-del{ border:none; background:none; cursor:pointer; font-size:12px; opacity:0; transition:opacity .15s ease; padding:4px; flex:none; }
   .msg-row:hover .msg-del{ opacity:.5; }
   .msg-del:hover{ opacity:1 !important; }
   .msg-time{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--ink-soft); margin-top:3px; padding:0 4px; }
+  .pending-photo{ display:none; align-items:center; gap:10px; padding:8px 16px; border-top:1px solid var(--line); background:var(--paper-soft); font-size:12px; color:var(--ink-soft); flex:none; }
+  .pending-photo img{ width:44px; height:44px; object-fit:cover; border-radius:10px; }
+  .pending-photo button{ margin-left:auto; border:none; background:none; cursor:pointer; font-size:15px; color:var(--ink-soft); }
   .compose{ display:flex; gap:8px; padding:12px 16px 16px; border-top:1px solid var(--line); background:var(--paper); }
-  .compose input{ flex:1; border:2px solid var(--line); border-radius:16px; padding:10px 14px; font-family:'Nunito', sans-serif; font-size:14px; background:var(--paper-soft); color:var(--ink); outline:none; transition:border-color .15s ease; }
+  .compose input{ flex:1; min-width:0; border:2px solid var(--line); border-radius:16px; padding:10px 14px; font-family:'Nunito', sans-serif; font-size:14px; background:var(--paper-soft); color:var(--ink); outline:none; transition:border-color .15s ease; }
   .compose input:focus{ border-color:var(--ink-soft); }
+  .photo-btn{ border:2px solid var(--line); background:var(--paper-soft); width:44px; height:44px; border-radius:14px; font-size:18px; cursor:pointer; flex:none; transition:transform .12s ease; }
+  .photo-btn:hover{ transform:scale(1.06) rotate(4deg); }
   .send-btn{ border:none; background:var(--ink); color:var(--paper); width:44px; height:44px; border-radius:14px; font-size:17px; cursor:pointer; flex:none; transition:transform .12s ease; }
   .send-btn:hover{ transform:scale(1.06) rotate(-4deg); }
   .send-btn:active{ transform:scale(.94); }
 
   /* Planner */
   #view-planner{ background:repeating-linear-gradient(90deg, #A9714B 0 46px, #9C6642 46px 48px); }
+  [data-theme="dark"] #view-planner{ background:repeating-linear-gradient(90deg, #5E3F2B 0 46px, #553826 46px 48px); }
   .clipboard{ position:relative; flex:1; min-height:0; margin:24px 16px 16px; background:#8B5A3C; padding:22px 10px 10px; border-radius:12px; display:flex; flex-direction:column; box-shadow:0 12px 24px rgba(0,0,0,.35); }
   .clip{ position:absolute; top:-10px; left:50%; width:96px; height:26px; margin-left:-48px; z-index:2; background:linear-gradient(#D5D9DC,#9AA0A5); border-radius:7px; box-shadow:0 3px 0 rgba(0,0,0,.25); }
   .clip::after{ content:''; position:absolute; left:50%; top:7px; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:#6B4430; }
   .planner{ padding:16px; overflow-y:auto; flex:1; min-height:0; background:var(--paper); border-radius:4px; }
   .date-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .date-nav button{ border:none; background:var(--paper-soft); border:1px solid var(--line); width:34px; height:34px; border-radius:10px; cursor:pointer; font-size:14px; }
+  .date-nav button{ background:var(--paper-soft); color:var(--ink); border:1px solid var(--line); width:34px; height:34px; border-radius:10px; cursor:pointer; font-size:14px; }
   .date-label{ text-align:center; }
   .date-label .day{ font-family:'Baloo 2', sans-serif; font-size:15px; }
   .date-label .today-pill{ display:inline-block; margin-top:2px; font-size:10px; font-family:'IBM Plex Mono', monospace; color:var(--good); text-transform:uppercase; letter-spacing:.05em; }
@@ -173,7 +244,8 @@
   .add-form input[type=text]{ grid-column:2; }
   .add-form input[type=time]{ grid-column:1; }
   .who-row{ grid-column:1 / -1; display:flex; gap:6px; }
-  .who-chip{ flex:1; border:1px solid var(--line); background:var(--paper); border-radius:10px; padding:6px 0; font-size:12px; font-family:'Baloo 2', sans-serif; cursor:pointer; text-align:center; transition:box-shadow .12s ease, border-color .12s ease; }
+  .who-chip{ flex:1; border:1px solid var(--line); background:var(--paper); border-radius:10px; padding:6px 0; font-size:12px; font-family:'Baloo 2', sans-serif; cursor:pointer; text-align:center; transition:box-shadow .12s ease, border-color .12s ease; display:flex; align-items:center; justify-content:center; gap:4px; }
+  .who-chip .face{ width:18px; height:18px; }
   .who-chip.sel-dog{ border-color:var(--dog); box-shadow:inset 0 0 0 1.5px var(--dog); background:var(--dog-soft); }
   .who-chip.sel-cat{ border-color:var(--cat); box-shadow:inset 0 0 0 1.5px var(--cat); background:var(--cat-soft); }
   .who-chip.sel-both{ border-color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--ink); }
@@ -186,19 +258,75 @@
   .task-time{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); width:44px; flex:none; }
   .task-title{ flex:1; font-size:14px; }
   .task.done .task-title{ text-decoration:line-through; color:var(--ink-soft); }
-  .task-who{ font-size:15px; flex:none; }
+  .task-who{ font-size:15px; flex:none; display:flex; align-items:center; }
+  .task-who .face{ width:24px; height:24px; }
   .task-del{ border:none; background:none; color:var(--ink-soft); cursor:pointer; font-size:13px; padding:4px; flex:none; opacity:.5; }
   .task-del:hover{ opacity:1; color:var(--bad); }
   .empty-planner{ text-align:center; color:var(--ink-soft); font-size:13.5px; padding:30px 10px; }
 
-  .toast{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--paper); font-family:'IBM Plex Mono', monospace; font-size:11px; padding:8px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:50; white-space:nowrap; }
+  .lightbox{ position:absolute; inset:0; z-index:80; background:rgba(10,8,6,.9); display:none; align-items:center; justify-content:center; padding:20px; cursor:zoom-out; }
+  .lightbox.show{ display:flex; }
+  .lightbox img{ max-width:100%; max-height:100%; border-radius:12px; }
+
+  .toast{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--paper); font-family:'IBM Plex Mono', monospace; font-size:11px; padding:8px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:90; white-space:nowrap; max-width:92%; overflow:hidden; text-overflow:ellipsis; }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
   ::-webkit-scrollbar{ width:6px; }
   ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:10px; }
+
+  /* ---------- Desktop: library on the left, to-do / blue book on the right ---------- */
+  @media (min-width: 900px){
+    .card{ max-width:1120px; max-height:860px; }
+    .stage{ display:flex; }
+    .scene-wrap{ position:relative; inset:auto; flex:1 1 auto; min-width:0; }
+    .view{ position:relative; inset:auto; width:450px; flex:none; z-index:1; border-left:3px solid var(--line); }
+    .mob-only{ display:none !important; }
+    .desk-only{ display:inline-block; }
+    .chat-img{ width:240px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- Shared animal faces (drawn once, reused for the walking avatars, header, chat and to-do list) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="dog-head">
+      <path d="M-12 -35 L12 -35 L0 -21 Z" fill="#C96A5A" stroke="#A94F41" stroke-width=".7" stroke-linejoin="round"/>
+      <circle cx="0" cy="-23.5" r="2.1" fill="#F0C14B" stroke="#B78B1E" stroke-width=".6"/>
+      <ellipse cx="-15" cy="-50" rx="6.5" ry="11.5" fill="#A8591F" transform="rotate(18 -15 -50)"/>
+      <ellipse cx="15" cy="-50" rx="6.5" ry="11.5" fill="#A8591F" transform="rotate(-18 15 -50)"/>
+      <ellipse cx="0" cy="-48" rx="17" ry="16" fill="#ED8546"/>
+      <ellipse cx="0" cy="-42" rx="9.5" ry="7.5" fill="#FFE9D0"/>
+      <path d="M-2 -38.8 Q0 -33.6 2 -38.8 Z" fill="#E9807F"/>
+      <path d="M0 -42.8 V-41 M0 -41 Q-3.2 -37.8 -6 -40.4 M0 -41 Q3.2 -37.8 6 -40.4" fill="none" stroke="#2E2620" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="0" cy="-45.2" rx="3.4" ry="2.4" fill="#2E2620"/>
+      <ellipse cx="-.9" cy="-46" rx="1" ry=".6" fill="#fff" opacity=".7"/>
+      <g class="eye"><circle cx="-6.5" cy="-50.5" r="2.6" fill="#2E2620"/><circle cx="-5.7" cy="-51.4" r=".9" fill="#fff"/></g>
+      <g class="eye"><circle cx="6.5" cy="-50.5" r="2.6" fill="#2E2620"/><circle cx="5.7" cy="-51.4" r=".9" fill="#fff"/></g>
+      <circle cx="-11.5" cy="-44.5" r="2.8" fill="#F4A0A0" opacity=".55"/>
+      <circle cx="11.5" cy="-44.5" r="2.8" fill="#F4A0A0" opacity=".55"/>
+    </g>
+    <g id="cat-head">
+      <path d="M-11 -35 Q0 -29 11 -35 L10 -31 Q0 -25.5 -10 -31 Z" fill="#E86A8E"/>
+      <circle cx="0" cy="-27" r="2.6" fill="#F0C14B" stroke="#B78B1E" stroke-width=".6"/>
+      <polygon points="-17,-52 -15,-71 -3,-60" fill="#7A4AA8"/>
+      <polygon points="17,-52 15,-71 3,-60" fill="#7A4AA8"/>
+      <polygon points="-14.5,-55 -14,-67 -6,-60" fill="#F2A0B5"/>
+      <polygon points="14.5,-55 14,-67 6,-60" fill="#F2A0B5"/>
+      <ellipse cx="0" cy="-47" rx="18" ry="15.5" fill="#7A4AA8"/>
+      <path d="M0 -62 v4.5 M-4.5 -61.2 l1 3.6 M4.5 -61.2 l-1 3.6" fill="none" stroke="#5B2C82" stroke-width="1.3" stroke-linecap="round"/>
+      <ellipse cx="0" cy="-41" rx="9" ry="6.5" fill="#E6D7F2"/>
+      <path d="M-2.2 -44.6 h4.4 l-2.2 2.8 z" fill="#F2A0B5"/>
+      <path d="M0 -41.8 Q-2.6 -38.6 -5.2 -41 M0 -41.8 Q2.6 -38.6 5.2 -41" fill="none" stroke="#2E2620" stroke-width="1.1" stroke-linecap="round"/>
+      <g class="eye"><ellipse cx="-7" cy="-49" rx="3.4" ry="3.6" fill="#F0C14B"/><ellipse cx="-7" cy="-49" rx="1.3" ry="2.8" fill="#2E2620"/><circle cx="-6" cy="-50.4" r=".9" fill="#fff"/></g>
+      <g class="eye"><ellipse cx="7" cy="-49" rx="3.4" ry="3.6" fill="#F0C14B"/><ellipse cx="7" cy="-49" rx="1.3" ry="2.8" fill="#2E2620"/><circle cx="8" cy="-50.4" r=".9" fill="#fff"/></g>
+      <path d="M-10 -42.5 L-24 -44.5 M-10 -41 L-24.5 -40.5 M-10 -39.5 L-23 -36.5 M10 -42.5 L24 -44.5 M10 -41 L24.5 -40.5 M10 -39.5 L23 -36.5" fill="none" stroke="#EADCF5" stroke-width=".8" stroke-linecap="round"/>
+      <circle cx="-12" cy="-43" r="2.6" fill="#F4A0C0" opacity=".5"/>
+      <circle cx="12" cy="-43" r="2.6" fill="#F4A0C0" opacity=".5"/>
+    </g>
+  </defs>
+</svg>
 
 <div class="card" id="card">
 
@@ -209,21 +337,12 @@
     <p class="field-error" id="setup-error-detail"></p>
   </div>
 
-  <div class="gate" id="room-gate" style="display:none;">
-    <h1>🐾 Paws & Plans</h1>
-    <p>Make up a private room code — anything only the two of you know. Whoever types it first, tell the other exactly what you typed.</p>
-    <input class="text-input" type="text" id="room-code-input" placeholder="our-secret-code" maxlength="60" onkeydown="if(event.key==='Enter')submitRoomCode()">
-    <p class="field-error" id="room-error"></p>
-    <button class="primary-btn" onclick="submitRoomCode()">Continue</button>
-    <p style="font-size:11px;color:var(--ink-soft);max-width:250px;">Anyone who knows this exact code can open your space, so make it a little unusual — not "1234".</p>
-  </div>
-
   <div class="gate" id="gate" style="display:none;">
     <h1>Whose paws are these?</h1>
     <p>Pick who you are on this device.</p>
     <div class="role-picks">
-      <button class="role-btn dog" onclick="selectRole('dog')"><span class="emoji">🐶</span> I'm the pup</button>
-      <button class="role-btn cat" onclick="selectRole('cat')"><span class="emoji">🐱</span> I'm the cat</button>
+      <button class="role-btn dog" onclick="selectRole('dog')"><svg class="face" viewBox="-24 -73 48 49"><use href="#dog-head"/></svg> I'm the pup</button>
+      <button class="role-btn cat" onclick="selectRole('cat')"><svg class="face" viewBox="-24 -73 48 49"><use href="#cat-head"/></svg> I'm the cat</button>
     </div>
   </div>
 
@@ -232,7 +351,7 @@
     <div class="header">
       <div class="pair-row">
         <div class="profile" id="profile-dog">
-          <div class="tag dog">🐶</div>
+          <div class="tag dog"><svg class="face" viewBox="-24 -73 48 49"><use href="#dog-head"/></svg></div>
           <div class="name-wrap">
             <div class="role-label">pup</div>
             <div class="name-line">
@@ -243,7 +362,7 @@
         </div>
         <span class="heart">🩶</span>
         <div class="profile right" id="profile-cat">
-          <div class="tag cat">🐱</div>
+          <div class="tag cat"><svg class="face" viewBox="-24 -73 48 49"><use href="#cat-head"/></svg></div>
           <div class="name-wrap">
             <div class="role-label">cat</div>
             <div class="name-line">
@@ -255,21 +374,23 @@
       </div>
       <div class="greeting" id="greeting">🐾 Loading today's plans…</div>
       <div class="meta-row">
-        <span class="room-badge" id="room-badge"></span>
-        <span class="switch-link" onclick="switchDevice()">switch room / role on this device</span>
+        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙 Dark</button>
+        <span class="book-count" id="book-count" title="Every to-do adds a book to the shelves">📚 0</span>
+        <span class="switch-link" onclick="switchDevice()">switch role on this device</span>
       </div>
     </div>
 
     <!-- THE LIBRARY -->
     <div class="stage" id="stage">
 
-      <svg id="library-scene" viewBox="0 0 400 500" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="A cosy library. Tap the floor to walk around. The one blue book on the shelf opens the chat. The study table opens the to-do list.">
+      <div class="scene-wrap">
+      <svg id="library-scene" viewBox="0 0 400 580" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="A cosy library. Tap the floor to walk around. Every to-do adds a book to the shelves, and only one of them is blue: that one opens the chat. The study table opens the to-do list.">
         <defs>
           <linearGradient id="wallGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="372"><stop offset="0" stop-color="#6B4430"/><stop offset="1" stop-color="#4F3224"/></linearGradient>
-          <linearGradient id="floorGrad" gradientUnits="userSpaceOnUse" x1="0" y1="372" x2="0" y2="500"><stop offset="0" stop-color="#B07A50"/><stop offset="1" stop-color="#86563A"/></linearGradient>
+          <linearGradient id="floorGrad" gradientUnits="userSpaceOnUse" x1="0" y1="372" x2="0" y2="580"><stop offset="0" stop-color="#B07A50"/><stop offset="1" stop-color="#86563A"/></linearGradient>
           <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2547"/><stop offset="1" stop-color="#3A4F86"/></linearGradient>
           <radialGradient id="lampGlow"><stop offset="0" stop-color="#FFD98A" stop-opacity=".55"/><stop offset="1" stop-color="#FFD98A" stop-opacity="0"/></radialGradient>
-          <mask id="moonMask"><rect x="0" y="0" width="400" height="500" fill="#fff"/><circle cx="226" cy="67" r="11" fill="#000"/></mask>
+          <mask id="moonMask"><rect x="0" y="0" width="400" height="580" fill="#fff"/><circle cx="226" cy="67" r="11" fill="#000"/></mask>
         </defs>
 
         <!-- Wall, wainscot, floor -->
@@ -277,10 +398,11 @@
         <rect x="-400" y="300" width="1200" height="72" fill="#432A1E"/>
         <rect x="-400" y="298" width="1200" height="5" fill="#7B4B30"/>
         <rect x="-400" y="364" width="1200" height="8" fill="#3E2619"/>
-        <rect x="-400" y="372" width="1200" height="400" fill="url(#floorGrad)"/>
+        <rect x="-400" y="372" width="1200" height="500" fill="url(#floorGrad)"/>
         <g stroke="#7A4C2F" stroke-opacity=".35" stroke-width="1.5">
           <line x1="-400" x2="800" y1="392" y2="392"/><line x1="-400" x2="800" y1="416" y2="416"/>
           <line x1="-400" x2="800" y1="446" y2="446"/><line x1="-400" x2="800" y1="482" y2="482"/>
+          <line x1="-400" x2="800" y1="522" y2="522"/><line x1="-400" x2="800" y1="560" y2="560"/>
         </g>
 
         <!-- Window -->
@@ -329,22 +451,25 @@
         <rect x="276" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
         <rect x="330" y="268" width="42" height="92" fill="none" stroke="#7B4B30" stroke-width="2"/>
         <circle cx="318" cy="314" r="3" fill="#E0B34A"/><circle cx="330" cy="314" r="3" fill="#E0B34A"/>
-        <!-- books (one of them, the only blue one, is the chat) are built by script -->
+        <!-- books are built by script: one per to-do, and exactly one blue one (the chat) -->
         <g id="books-right"></g>
         <rect x="300" y="22" width="44" height="8" rx="1.5" fill="#9B6B3F"/>
         <rect x="306" y="14" width="34" height="8" rx="1.5" fill="#D9A441"/>
         <rect x="302" y="6" width="38" height="8" rx="1.5" fill="#8C3B3B"/>
 
         <!-- Rug and floor shadow -->
-        <ellipse cx="200" cy="462" rx="178" ry="28" fill="#8C3B3B"/>
-        <ellipse cx="200" cy="462" rx="164" ry="23" fill="none" stroke="#D9A441" stroke-width="2" stroke-dasharray="6 4"/>
-        <ellipse cx="200" cy="488" rx="176" ry="9" fill="#000" opacity=".22"/>
+        <ellipse cx="200" cy="520" rx="185" ry="40" fill="#8C3B3B"/>
+        <ellipse cx="200" cy="520" rx="171" ry="34" fill="none" stroke="#D9A441" stroke-width="2" stroke-dasharray="6 4"/>
+        <ellipse cx="200" cy="538" rx="136" ry="7" fill="#000" opacity=".22"/>
+
+        <!-- Night shade for dark mode (the lamp-lit table and the walkers stay bright) -->
+        <rect id="night" x="-400" y="-800" width="1200" height="1700" fill="#0A0716" opacity="0"/>
 
         <!-- Walkers standing behind the table -->
         <g id="layer-behind"></g>
 
-        <!-- THE STUDY TABLE (opens the to-do list), scaled to leave room to walk around it -->
-        <g transform="translate(200 486) scale(.72) translate(-200 -486)">
+        <!-- THE STUDY TABLE (opens the to-do list) -->
+        <g transform="translate(200 536) scale(.72) translate(-200 -486)">
           <g id="table-hot" class="hot" role="button" tabindex="0" data-open="planner" aria-label="Open the study table to-do list">
             <g class="lift">
               <rect x="72" y="426" width="10" height="36" fill="#55321F"/>
@@ -355,7 +480,7 @@
               <polygon points="56,380 344,380 376,426 24,426" fill="#C98E5B" stroke="#3E2619" stroke-width="2" stroke-linejoin="round"/>
               <polygon points="56,380 344,380 350,388 50,388" fill="#D9A06C"/>
               <polygon points="322,396 352,396 368,424 306,424" fill="#FFD98A" opacity=".2"/>
-              <circle cx="334" cy="392" r="42" fill="url(#lampGlow)"/>
+              <circle class="lamp-glow" cx="334" cy="392" r="48" fill="url(#lampGlow)"/>
               <ellipse cx="334" cy="412" rx="14" ry="4" fill="#2F5D4A"/>
               <rect x="332" y="392" width="4" height="20" fill="#2F5D4A"/>
               <path d="M320 392 L326 374 L342 374 L348 392 Z" fill="#3F7D6A" stroke="#2F5D4A" stroke-width="1.5" stroke-linejoin="round"/>
@@ -373,11 +498,11 @@
               <rect x="169" y="411" width="5" height="5" fill="none" stroke="#C9B48F"/>
               <line x1="182" y1="414" x2="230" y2="414" stroke="#C9B48F"/>
               <rect x="236" y="402" width="26" height="4" rx="1" fill="#D9A441" transform="rotate(18 236 402)"/>
-              <rect x="148" y="446" width="104" height="22" rx="11" fill="#FFF8ED" stroke="#E7D8BE"/>
-              <text x="200" y="461" text-anchor="middle" font-size="11" fill="#2E2620">📋 To-Do list</text>
+              <rect x="138" y="446" width="124" height="28" rx="14" fill="#FFF8ED" stroke="#E7D8BE"/>
+              <text x="200" y="465" text-anchor="middle" font-size="14" fill="#2E2620">📋 To-Do list</text>
               <g id="table-badge" style="display:none">
-                <circle cx="250" cy="447" r="9" fill="#C96A5A" stroke="#FFF8ED" stroke-width="2"/>
-                <text id="table-badge-n" class="mono" x="250" y="450.5" text-anchor="middle" font-size="10" fill="#fff">1</text>
+                <circle cx="260" cy="447" r="10" fill="#C96A5A" stroke="#FFF8ED" stroke-width="2"/>
+                <text id="table-badge-n" class="mono" x="260" y="451" text-anchor="middle" font-size="11" fill="#fff">1</text>
               </g>
             </g>
           </g>
@@ -387,51 +512,93 @@
         <g id="layer-front">
           <!-- DOG -->
           <g id="av-dog" class="avatar" data-role="dog">
-            <ellipse cx="0" cy="0" rx="22" ry="6" fill="#000" opacity=".25"/>
+            <ellipse cx="0" cy="1" rx="22" ry="6" fill="#000" opacity=".25"/>
             <g class="av-in">
-              <ellipse cx="0" cy="-20" rx="19" ry="20" fill="#ED8546"/>
-              <circle cx="0" cy="-52" r="22" fill="#FBDAC0" stroke="#fff" stroke-width="2"/>
-              <text x="0" y="-41" text-anchor="middle" font-size="30">🐶</text>
+              <g class="tail"><path d="M10 -20 Q27 -22 25 -40" fill="none" stroke="#ED8546" stroke-width="7" stroke-linecap="round"/><circle cx="25" cy="-40.5" r="3.8" fill="#FFE9D0"/></g>
+              <g transform="translate(-7 -11)"><g class="leg leg-l"><rect x="-3.5" y="0" width="7" height="8" rx="3" fill="#ED8546"/><ellipse cx="0" cy="8" rx="6.6" ry="3.8" fill="#FFE9D0" stroke="#B5651D" stroke-width=".8"/><path d="M-2.3 6.8 v2.4 M2.3 6.8 v2.4" stroke="#B5651D" stroke-width=".8" stroke-linecap="round"/></g></g>
+              <g transform="translate(7 -11)"><g class="leg leg-r"><rect x="-3.5" y="0" width="7" height="8" rx="3" fill="#ED8546"/><ellipse cx="0" cy="8" rx="6.6" ry="3.8" fill="#FFE9D0" stroke="#B5651D" stroke-width=".8"/><path d="M-2.3 6.8 v2.4 M2.3 6.8 v2.4" stroke="#B5651D" stroke-width=".8" stroke-linecap="round"/></g></g>
+              <ellipse cx="0" cy="-25" rx="14.5" ry="15" fill="#ED8546"/>
+              <ellipse cx="0" cy="-22" rx="8.5" ry="10" fill="#FFE9D0"/>
+              <g transform="translate(-15 -34) rotate(12)"><g class="arm arm-l"><rect x="-3.8" y="0" width="7.6" height="15" rx="3.8" fill="#ED8546"/><circle cx="0" cy="15" r="4.6" fill="#FFE9D0" stroke="#B5651D" stroke-width=".8"/><circle cx="0" cy="15.9" r="1.8" fill="#E9A5A0"/><circle cx="-2.5" cy="13.2" r=".9" fill="#E9A5A0"/><circle cx="0" cy="12.5" r=".9" fill="#E9A5A0"/><circle cx="2.5" cy="13.2" r=".9" fill="#E9A5A0"/></g></g>
+              <g transform="translate(15 -34) rotate(-12)"><g class="arm arm-r"><rect x="-3.8" y="0" width="7.6" height="15" rx="3.8" fill="#ED8546"/><circle cx="0" cy="15" r="4.6" fill="#FFE9D0" stroke="#B5651D" stroke-width=".8"/><circle cx="0" cy="15.9" r="1.8" fill="#E9A5A0"/><circle cx="-2.5" cy="13.2" r=".9" fill="#E9A5A0"/><circle cx="0" cy="12.5" r=".9" fill="#E9A5A0"/><circle cx="2.5" cy="13.2" r=".9" fill="#E9A5A0"/></g></g>
+              <use href="#dog-head"/>
             </g>
-            <text id="svg-name-dog" x="0" y="-84" text-anchor="middle" font-size="10" font-weight="600" fill="#2E2620" stroke="#FFF8ED" stroke-width="3" stroke-linejoin="round" paint-order="stroke">Pup</text>
-            <g id="you-dog" style="display:none"><path class="twinkle" d="M-5 -102 l5 7 l5 -7 z" fill="#ED8546" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
+            <text id="svg-name-dog" x="0" y="-78" text-anchor="middle" font-size="10" font-weight="600" fill="#2E2620" stroke="#FFF8ED" stroke-width="3" stroke-linejoin="round" paint-order="stroke">Pup</text>
+            <g id="you-dog" style="display:none"><path class="twinkle" d="M-5 -96 l5 7 l5 -7 z" fill="#ED8546" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
           </g>
           <!-- CAT -->
           <g id="av-cat" class="avatar" data-role="cat">
-            <ellipse cx="0" cy="0" rx="22" ry="6" fill="#000" opacity=".25"/>
+            <ellipse cx="0" cy="1" rx="22" ry="6" fill="#000" opacity=".25"/>
             <g class="av-in">
-              <ellipse cx="0" cy="-20" rx="19" ry="20" fill="#5B2C82"/>
-              <circle cx="0" cy="-52" r="22" fill="#E6D7F2" stroke="#fff" stroke-width="2"/>
-              <text x="0" y="-41" text-anchor="middle" font-size="30">🐱</text>
+              <g class="tail"><path d="M10 -18 Q32 -16 28 -42" fill="none" stroke="#7A4AA8" stroke-width="6" stroke-linecap="round"/><path d="M28 -42 Q27.6 -45 27 -47" fill="none" stroke="#E6D7F2" stroke-width="6" stroke-linecap="round"/></g>
+              <g transform="translate(-7 -11)"><g class="leg leg-l"><rect x="-3.5" y="0" width="7" height="8" rx="3" fill="#7A4AA8"/><ellipse cx="0" cy="8" rx="6.6" ry="3.8" fill="#E6D7F2" stroke="#5B2C82" stroke-width=".8"/><path d="M-2.3 6.8 v2.4 M2.3 6.8 v2.4" stroke="#5B2C82" stroke-width=".8" stroke-linecap="round"/></g></g>
+              <g transform="translate(7 -11)"><g class="leg leg-r"><rect x="-3.5" y="0" width="7" height="8" rx="3" fill="#7A4AA8"/><ellipse cx="0" cy="8" rx="6.6" ry="3.8" fill="#E6D7F2" stroke="#5B2C82" stroke-width=".8"/><path d="M-2.3 6.8 v2.4 M2.3 6.8 v2.4" stroke="#5B2C82" stroke-width=".8" stroke-linecap="round"/></g></g>
+              <ellipse cx="0" cy="-25" rx="14" ry="15" fill="#7A4AA8"/>
+              <ellipse cx="0" cy="-22" rx="8" ry="10" fill="#E6D7F2"/>
+              <g transform="translate(-14.5 -34) rotate(12)"><g class="arm arm-l"><rect x="-3.6" y="0" width="7.2" height="15" rx="3.6" fill="#7A4AA8"/><circle cx="0" cy="15" r="4.5" fill="#E6D7F2" stroke="#5B2C82" stroke-width=".8"/><circle cx="0" cy="15.9" r="1.8" fill="#F2A0B5"/><circle cx="-2.5" cy="13.2" r=".9" fill="#F2A0B5"/><circle cx="0" cy="12.5" r=".9" fill="#F2A0B5"/><circle cx="2.5" cy="13.2" r=".9" fill="#F2A0B5"/></g></g>
+              <g transform="translate(14.5 -34) rotate(-12)"><g class="arm arm-r"><rect x="-3.6" y="0" width="7.2" height="15" rx="3.6" fill="#7A4AA8"/><circle cx="0" cy="15" r="4.5" fill="#E6D7F2" stroke="#5B2C82" stroke-width=".8"/><circle cx="0" cy="15.9" r="1.8" fill="#F2A0B5"/><circle cx="-2.5" cy="13.2" r=".9" fill="#F2A0B5"/><circle cx="0" cy="12.5" r=".9" fill="#F2A0B5"/><circle cx="2.5" cy="13.2" r=".9" fill="#F2A0B5"/></g></g>
+              <use href="#cat-head"/>
             </g>
-            <text id="svg-name-cat" x="0" y="-84" text-anchor="middle" font-size="10" font-weight="600" fill="#2E2620" stroke="#FFF8ED" stroke-width="3" stroke-linejoin="round" paint-order="stroke">Kitty</text>
-            <g id="you-cat" style="display:none"><path class="twinkle" d="M-5 -102 l5 7 l5 -7 z" fill="#5B2C82" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
+            <text id="svg-name-cat" x="0" y="-78" text-anchor="middle" font-size="10" font-weight="600" fill="#2E2620" stroke="#FFF8ED" stroke-width="3" stroke-linejoin="round" paint-order="stroke">Kitty</text>
+            <g id="you-cat" style="display:none"><path class="twinkle" d="M-5 -96 l5 7 l5 -7 z" fill="#7A4AA8" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
           </g>
         </g>
 
         <circle id="tap-mark" cx="0" cy="0" r="7" fill="none" stroke="#FFF8ED" stroke-width="2"/>
       </svg>
+      </div>
 
       <!-- CHAT VIEW (the blue book) -->
       <div class="view" id="view-chat">
         <div class="view-bar book-bar">
-          <button class="back-btn" onclick="closeView()">← Library</button>
+          <button class="back-btn mob-only" onclick="closeView()">← Library</button>
           <span class="view-title">📘 Our blue book</span>
+          <button class="back-btn desk-only" onclick="openView('planner')">📋 To-do</button>
+          <button class="back-btn push" id="lock-btn" onclick="lockChat()" title="Lock the blue book again" style="display:none">🔒 Lock</button>
         </div>
-        <div class="chat-scroll" id="chat-scroll">
-          <div class="empty-state" id="chat-empty"><span class="emoji">🐾💬</span>Nothing said yet. Say hi first!</div>
+
+        <!-- asks for the secret code -->
+        <div class="gate chat-gate" id="chat-gate">
+          <div class="lock">🔒</div>
+          <h1>The blue book is locked</h1>
+          <p>Type your secret code. Whoever types it first, tell the other exactly what you typed.</p>
+          <input class="text-input" type="text" id="chat-code-input" placeholder="our-secret-code" maxlength="60" autocomplete="off" onkeydown="if(event.key==='Enter')submitChatCode()">
+          <p class="field-error" id="chat-code-error"></p>
+          <label class="remember"><input type="checkbox" id="chat-remember" checked> Remember on this device</label>
+          <button class="primary-btn" onclick="submitChatCode()">Open the book</button>
         </div>
-        <div class="compose">
-          <input type="text" id="chat-input" placeholder="Type something sweet…" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage()">
-          <button class="send-btn" onclick="sendMessage()">➤</button>
+
+        <div class="chat-body" id="chat-body" style="display:none;">
+          <div class="chat-tools">
+            <button class="vanish-toggle" id="vanish-btn" onclick="toggleVanish()" aria-pressed="false" title="Your new messages and photos disappear after 24 hours">
+              <span class="sw"><span class="knob"></span></span>
+              <span>⏳ Vanish after 24h</span>
+            </button>
+            <span class="partner-state" id="partner-vanish"></span>
+          </div>
+          <div class="chat-scroll" id="chat-scroll">
+            <div class="empty-state" id="chat-empty"><span class="emoji">🐾💬</span>Nothing said yet. Say hi first!</div>
+          </div>
+          <div class="pending-photo" id="pending-photo">
+            <img id="pending-img" alt="Photo ready to send">
+            <span>Photo ready — add a caption or just hit send</span>
+            <button onclick="clearPhoto()" title="Remove photo">✕</button>
+          </div>
+          <div class="compose">
+            <button class="photo-btn" onclick="document.getElementById('photo-input').click()" title="Send a photo">📷</button>
+            <input type="text" id="chat-input" placeholder="Type something sweet…" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+          </div>
+          <input type="file" id="photo-input" accept="image/*" hidden onchange="onPhotoPicked(event)">
         </div>
       </div>
 
       <!-- PLANNER VIEW (the study table) -->
       <div class="view" id="view-planner">
         <div class="view-bar table-bar">
-          <button class="back-btn" onclick="closeView()">← Library</button>
+          <button class="back-btn mob-only" onclick="closeView()">← Library</button>
           <span class="view-title">🪑 Study table</span>
+          <button class="back-btn desk-only" onclick="openView('chat')">💬 Blue book</button>
         </div>
         <div class="clipboard">
           <div class="clip"></div>
@@ -446,15 +613,15 @@
             </div>
             <div class="add-form">
               <input type="time" id="new-time" value="09:00">
-              <input type="text" id="new-title" placeholder="What's happening?" maxlength="80">
+              <input type="text" id="new-title" placeholder="What's happening?" maxlength="80" onkeydown="if(event.key==='Enter')addTask()">
               <div class="who-row" id="who-row">
-                <div class="who-chip" data-who="dog" onclick="pickWho('dog')">🐶 Pup</div>
-                <div class="who-chip" data-who="cat" onclick="pickWho('cat')">🐱 Cat</div>
+                <div class="who-chip" data-who="dog" onclick="pickWho('dog')"><svg class="face" viewBox="-24 -73 48 49"><use href="#dog-head"/></svg> Pup</div>
+                <div class="who-chip" data-who="cat" onclick="pickWho('cat')"><svg class="face" viewBox="-24 -73 48 49"><use href="#cat-head"/></svg> Cat</div>
                 <div class="who-chip sel-both" data-who="both" onclick="pickWho('both')">🐾 Both</div>
               </div>
               <button class="add-btn" onclick="addTask()">+ Add to today</button>
             </div>
-            <div class="list-heading">To-Do List</div>
+            <div class="list-heading">To-Do List · every item adds a book 📚</div>
             <div class="task-list" id="task-list"></div>
           </div>
         </div>
@@ -462,6 +629,8 @@
 
     </div>
   </div>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" alt="Photo"></div>
 </div>
 
 <script>
@@ -479,17 +648,28 @@
   };
   // =====================================================================
 
+  // The to-do list, the books and the walking avatars live in this shared "home".
+  // The chat is separate: it lives under whatever secret code you type after tapping the blue book.
+  // (To keep to-dos you made before this version, set HOME_ROOM to the room code you used back then.)
+  const HOME_ROOM = 'paws-home';
+
+  const DAY = 24 * 60 * 60 * 1000;
+
   let db = null;
-  let roomId = null;
+  let homeId = HOME_ROOM;
+  let chatId = null;         // set once the secret code has been typed
   let myRole = null;
   let profiles = { dog: { name: 'Pup' }, cat: { name: 'Kitty' } };
   let messages = [];
+  let settings = {};         // { dog:{vanish:bool}, cat:{vanish:bool} }
   let tasks = [];
   let currentDate = new Date();
   let pickedWho = 'both';
   let plannerRef = null;
+  let messagesRef = null, settingsRef = null;
   let openName = null;       // 'chat' | 'planner' | null (library)
   let lastSeenTime = 0;      // newest chat message you've seen
+  let pendingImg = null;
 
   // Small per-device storage: localStorage first, window.storage as a fallback
   const store = {
@@ -507,6 +687,9 @@
       try{ if(window.storage) await window.storage.delete(k, false); }catch(e){}
     }
   };
+
+  const isDesktop = () => window.matchMedia('(min-width: 900px)').matches;
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function escapeHtml(str){
     const d = document.createElement('div');
@@ -526,58 +709,107 @@
     if(!s) s = 'our-room';
     return s.slice(0, 60);
   }
+  function face(role){
+    return `<svg class="face" viewBox="-24 -73 48 49" aria-hidden="true"><use href="#${role}-head"/></svg>`;
+  }
 
-  // ---------- library books ----------
-  // Every book is built the same way. Exactly one of them is blue, and that one opens the chat.
-  (function buildBooks(){
-    const NS = 'http://www.w3.org/2000/svg';
-    const BLUE = '#2F6FDE';
-    const colors = ['#C96A5A','#9B6B3F','#D9A441','#5E8B5E','#EFE0BF','#8E5A86','#8C3B3B','#8A8F4F','#D99A9A','#B5651D'];
+  // ---------- dark mode ----------
+  function updateThemeBtn(){
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.getElementById('theme-btn').textContent = dark ? '☀️ Light' : '🌙 Dark';
+  }
+  function toggleTheme(){
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    store.set('theme', next);
+    updateThemeBtn();
+  }
+
+  // ---------- library books: one per to-do, plus exactly one blue one ----------
+  const NS = 'http://www.w3.org/2000/svg';
+  const BOOK_COLORS = ['#C96A5A','#9B6B3F','#D9A441','#5E8B5E','#EFE0BF','#8E5A86','#8C3B3B','#8A8F4F','#D99A9A','#B5651D'];
+  const SHELVES = [ { x0:24, x1:128, g:'books-left' }, { x0:272, x1:376, g:'books-right' } ];
+  const ROW_BASES = [254, 182, 110];   // bottom row first, so the shelves fill from the bottom up
+
+  function svgEl(name, attrs, parent){
+    const e = document.createElementNS(NS, name);
+    for(const k in attrs) e.setAttribute(k, attrs[k]);
+    parent.appendChild(e);
+    return e;
+  }
+
+  function buildSlots(){
     let seed = 11;
     const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-    function el(name, attrs, parent){
-      const e = document.createElementNS(NS, name);
-      for(const k in attrs) e.setAttribute(k, attrs[k]);
-      parent.appendChild(e);
-      return e;
-    }
-    function fillRow(g, x0, x1, base, blueIdx){
-      let x = x0, count = 0;
-      while(x < x1 - 8){
-        const isBlue = blueIdx !== null && count === blueIdx;
-        let w = Math.round(8 + rnd() * 8);
-        if(isBlue) w = 12;
-        if(x + w > x1) break;
-        let h = Math.round(36 + rnd() * 22);
-        let c = colors[Math.floor(rnd() * colors.length)];
-        if(isBlue){ h = 50; c = BLUE; }
-
-        let hot = null, parent = g;
-        if(isBlue){
-          hot = el('g', { id:'book-hot', class:'hot', role:'button', tabindex:'0', 'data-open':'chat', 'aria-label':'Open the blue book to chat' }, g);
-          el('rect', { x:x-3, y:base-h-3, width:w+6, height:h+6, fill:'transparent' }, hot);
-          parent = el('g', { class:'lift' }, hot);
+    const rows = [];
+    ROW_BASES.forEach(base => {
+      SHELVES.forEach((s, si) => {
+        const row = [];
+        let x = s.x0;
+        while(x < s.x1 - 8){
+          const w = Math.round(8 + rnd() * 8);
+          if(x + w > s.x1) break;
+          row.push({ shelf:si, x:x, w:w, h:Math.round(36 + rnd() * 22), base:base, c:BOOK_COLORS[Math.floor(rnd() * BOOK_COLORS.length)] });
+          x += w + (rnd() < 0.15 ? 6 + rnd() * 6 : 0.8);
         }
-        const b = el('g', {}, parent);
-        el('rect', { x:x, y:base-h, width:w, height:h, rx:1.5, fill:c, stroke:'rgba(0,0,0,.28)', 'stroke-width':.8 }, b);
-        el('rect', { x:x, y:base-h+5, width:w, height:2.5, fill:'rgba(255,255,255,.35)' }, b);
-        el('rect', { x:x, y:base-10, width:w, height:2.5, fill:'rgba(0,0,0,.2)' }, b);
-
-        if(isBlue){
-          const badge = el('g', { id:'book-badge', style:'display:none' }, hot);
-          el('circle', { cx:x+w, cy:base-h-1, r:8, fill:'#C96A5A', stroke:'#FFF8ED', 'stroke-width':2 }, badge);
-          const t = el('text', { id:'book-badge-n', class:'mono', x:x+w, y:base-h+2.5, 'text-anchor':'middle', 'font-size':9, fill:'#fff' }, badge);
-          t.textContent = '1';
-        }
-        count++;
-        x += w + (rnd() < 0.15 ? 6 + rnd() * 6 : 0.8);
-      }
+        rows.push(row);
+      });
+    });
+    const slots = [];
+    for(let i = 0; i < rows.length; i += 2){
+      const L = rows[i], R = rows[i+1], n = Math.max(L.length, R.length);
+      for(let k = 0; k < n; k++){ if(L[k]) slots.push(L[k]); if(R[k]) slots.push(R[k]); }
     }
-    const left = document.getElementById('books-left');
-    const right = document.getElementById('books-right');
-    [110, 182, 254].forEach(base => fillRow(left, 24, 128, base, null));
-    [110, 182, 254].forEach(base => fillRow(right, 272, 376, base, base === 182 ? 4 : null));
+    return slots;
+  }
+  const SLOTS = buildSlots();
+  const BLUE_SLOT = (function(){
+    let h = 7;
+    for(let i = 0; i < HOME_ROOM.length; i++) h = (h * 31 + HOME_ROOM.charCodeAt(i)) >>> 0;
+    return h % SLOTS.length;
   })();
+  const BOOK_CAP = SLOTS.length - 1;
+  let bookCount = 0, booksShown = -1;
+
+  function renderBooks(animate){
+    const shown = Math.min(bookCount, BOOK_CAP);
+    const prev = booksShown < 0 ? 0 : booksShown;
+    SHELVES.forEach(s => { document.getElementById(s.g).innerHTML = ''; });
+    let k = 0;
+    SLOTS.forEach((s, i) => {
+      const parent = document.getElementById(SHELVES[s.shelf].g);
+      if(i === BLUE_SLOT){ drawBlueBook(parent, s); return; }
+      if(k >= shown) return;
+      k++;
+      const g = svgEl('g', (animate && k > prev) ? { class:'book-pop' } : {}, parent);
+      svgEl('rect', { x:s.x, y:s.base-s.h, width:s.w, height:s.h, rx:1.5, fill:s.c, stroke:'rgba(0,0,0,.28)', 'stroke-width':.8 }, g);
+      svgEl('rect', { x:s.x, y:s.base-s.h+5, width:s.w, height:2.5, fill:'rgba(255,255,255,.35)' }, g);
+      svgEl('rect', { x:s.x, y:s.base-10, width:s.w, height:2.5, fill:'rgba(0,0,0,.2)' }, g);
+    });
+    booksShown = shown;
+    updateBookBadge();
+  }
+
+  function drawBlueBook(parent, s){
+    const w = Math.max(s.w, 11), h = 50, x = s.x, base = s.base;
+    const hot = svgEl('g', { id:'book-hot', class:'hot', role:'button', tabindex:'0', 'data-open':'chat', 'aria-label':'Open the blue book to chat' }, parent);
+    svgEl('rect', { x:x-3, y:base-h-3, width:w+6, height:h+6, fill:'transparent' }, hot);
+    const lift = svgEl('g', { class:'lift' }, hot);
+    svgEl('rect', { x:x, y:base-h, width:w, height:h, rx:1.5, fill:'#2F6FDE', stroke:'#1B3F8F', 'stroke-width':1 }, lift);
+    svgEl('rect', { x:x, y:base-h+4, width:w, height:2.5, fill:'#E0B34A' }, lift);
+    svgEl('rect', { x:x, y:base-9, width:w, height:2.5, fill:'#E0B34A' }, lift);
+    svgEl('rect', { x:x+1.6, y:base-h+10, width:1.6, height:h-22, fill:'rgba(255,255,255,.35)' }, lift);
+    const badge = svgEl('g', { id:'book-badge', style:'display:none' }, hot);
+    svgEl('circle', { cx:x+w, cy:base-h-1, r:8, fill:'#C96A5A', stroke:'#FFF8ED', 'stroke-width':2 }, badge);
+    const t = svgEl('text', { id:'book-badge-n', class:'mono', x:x+w, y:base-h+2.5, 'text-anchor':'middle', 'font-size':9, fill:'#fff' }, badge);
+    t.textContent = '1';
+  }
+
+  function setBookCount(n, animate){
+    bookCount = n;
+    document.getElementById('book-count').textContent = '📚 ' + n;
+    if(Math.min(n, BOOK_CAP) !== booksShown) renderBooks(animate);
+  }
 
   // ---------- toast ----------
   function showToast(text, ms){
@@ -602,6 +834,7 @@
   }
 
   async function boot(){
+    updateThemeBtn();
     if(configIsPlaceholder()){
       document.getElementById('setup-needed').style.display = 'flex';
       return;
@@ -616,27 +849,6 @@
       return;
     }
 
-    let savedRoom = null;
-    try{ const r = await store.get('room-code'); savedRoom = r && r.value; }catch(e){}
-    if(savedRoom){
-      roomId = savedRoom;
-      await afterRoom();
-    } else {
-      document.getElementById('room-gate').style.display = 'flex';
-    }
-  }
-
-  async function submitRoomCode(){
-    const val = document.getElementById('room-code-input').value.trim();
-    const err = document.getElementById('room-error');
-    if(!val){ err.innerText = 'Type a code first.'; return; }
-    roomId = sanitizeRoomId(val);
-    await store.set('room-code', roomId);
-    document.getElementById('room-gate').style.display = 'none';
-    await afterRoom();
-  }
-
-  async function afterRoom(){
     let savedRole = null;
     try{ const r = await store.get('my-role'); savedRole = r && r.value; }catch(e){}
     if(savedRole){
@@ -655,30 +867,45 @@
   }
 
   async function switchDevice(){
-    if(!confirm("This resets the room code and role on this device only. You'll re-enter them. Continue?")) return;
-    await store.delete('room-code');
+    if(!confirm("This resets your role and the chat code on this device only. You'll pick them again. Continue?")) return;
     await store.delete('my-role');
+    await store.delete('chat-code');
     location.reload();
   }
 
   // ---------- main ----------
-  function showMain(){
+  async function showMain(){
     document.getElementById('main').style.display = 'flex';
-    document.getElementById('room-badge').innerText = '#' + roomId;
-    loadSeen();
     attachProfileListener();
-    attachMessagesListener();
     attachPlannerListener();
+    attachBooksListener();
     renderDateLabel();
     startWalking();
+    if(isDesktop()) openView('planner');
+
+    // if this device already knows the secret code, the blue book can show unread messages right away
+    try{
+      const r = await store.get('chat-code');
+      if(r && r.value && !chatId){ attachChat(r.value); syncChatPane(); }
+    }catch(e){}
   }
 
   function attachProfileListener(){
-    db.ref('rooms/'+roomId+'/profile').on('value', snap => {
+    db.ref('rooms/'+homeId+'/profile').on('value', snap => {
       const val = snap.val() || {};
       profiles.dog = val.dog || { name: 'Pup' };
       profiles.cat = val.cat || { name: 'Kitty' };
       renderProfiles();
+    });
+  }
+
+  let firstBooks = true;
+  function attachBooksListener(){
+    db.ref('rooms/'+homeId+'/planner').on('value', snap => {
+      let n = 0;
+      snap.forEach(day => { day.forEach(() => { n++; }); });
+      setBookCount(n, !firstBooks);
+      firstBooks = false;
     });
   }
 
@@ -705,6 +932,7 @@
     } else {
       g.innerText = `🐾 ${undone} thing${undone===1?'':'s'} left on your plate today`;
     }
+    renderVanish();
   }
 
   async function editName(role){
@@ -713,12 +941,12 @@
     const next = prompt('What should we call you?', current);
     if(!next || !next.trim()) return;
     try{
-      await db.ref('rooms/'+roomId+'/profile/'+role).set({ name: next.trim().slice(0,20) });
+      await db.ref('rooms/'+homeId+'/profile/'+role).set({ name: next.trim().slice(0,20) });
       showToast('💾 Saved');
     }catch(e){ showToast('⚠️ Could not save — try again'); }
   }
 
-  // ---------- library navigation ----------
+  // ---------- navigation ----------
   function openView(name){
     const chat = name === 'chat';
     openName = name;
@@ -726,11 +954,16 @@
     document.getElementById('view-chat').classList.toggle('active', chat);
     document.getElementById('view-planner').classList.toggle('active', !chat);
     if(chat){
-      markChatSeen();
-      const sc = document.getElementById('chat-scroll');
-      setTimeout(()=>{ sc.scrollTop = sc.scrollHeight; }, 30);
+      syncChatPane();
+      if(chatId){
+        markChatSeen();
+        scrollChatDown();
+      } else {
+        setTimeout(() => { const i = document.getElementById('chat-code-input'); if(i && !isTouch()) i.focus(); }, 80);
+      }
     }
   }
+  const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
 
   function closeView(){
     if(openName === 'chat') markChatSeen();
@@ -744,16 +977,14 @@
     }
   }
 
-  document.querySelectorAll('.hot').forEach(el => {
-    const target = el.getAttribute('data-open');
-    el.addEventListener('click', () => openView(target));
-    el.addEventListener('keydown', e => {
-      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openView(target); }
-    });
+  window.matchMedia('(min-width: 900px)').addEventListener('change', e => {
+    if(e.matches && !openName && myRole) openView('planner');
   });
-  document.addEventListener('keydown', e => {
-    if(e.key === 'Escape' && openName) closeView();
-  });
+
+  function scrollChatDown(){
+    const sc = document.getElementById('chat-scroll');
+    setTimeout(()=>{ sc.scrollTop = sc.scrollHeight; }, 30);
+  }
 
   function hop(role){
     const el = document.querySelector('#av-'+role+' .av-in');
@@ -766,15 +997,16 @@
   }
 
   // ---------- walking around the library ----------
-  const BOUNDS = { minX:28, maxX:372, minY:392, maxY:494 };
-  const BLOCK  = { x1:66, y1:398, x2:334, y2:458 };   // the study table's footprint
-  const FRONT_Y = 446;                                  // feet below this = in front of the table
-  const SPEED = 115;                                    // svg units per second
-  const pos = { dog:{ x:78, y:474 }, cat:{ x:322, y:474 } };
-  const remote = {};
-  let path = [];
+  const BOUNDS = { minX:26, maxX:374, minY:386, maxY:568 };
+  const BLOCK  = { x1:66, y1:454, x2:334, y2:540 };   // the study table's footprint
+  const FRONT_Y = 497;                                 // feet below this = in front of the table
+  const SPEED = 80;                                    // svg units per second
+  const IDLE_BEFORE_WANDER = 2500;                     // ms of no input before your avatar wanders off by itself
+  const pos = { dog:{ x:70, y:470 }, cat:{ x:330, y:470 } };
+  const mv = { dog:{ path:[], wait:null }, cat:{ path:[], wait:null } };
+  const remoteTs = {}, remoteSeen = { dog:-Infinity, cat:-Infinity }, remoteInit = {};
   let keys = {};
-  let lastSend = 0, wasMoving = false, restored = false, loopOn = false, lastFrame = 0;
+  let lastInput = 0, lastKeySend = 0, wasKeyMoving = false, restored = false, loopOn = false, lastFrame = 0;
 
   const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
   const inBlock = (x,y) => x > BLOCK.x1 && x < BLOCK.x2 && y > BLOCK.y1 && y < BLOCK.y2;
@@ -811,8 +1043,7 @@
     return best || [b];
   }
 
-  function walkTo(x, y){
-    if(!myRole) return;
+  function fixTarget(x, y){
     let tx = clamp(x, BOUNDS.minX, BOUNDS.maxX), ty = clamp(y, BOUNDS.minY, BOUNDS.maxY);
     if(inBlock(tx, ty)){
       const sides = [[tx-BLOCK.x1,'l'],[BLOCK.x2-tx,'r'],[ty-BLOCK.y1,'t'],[BLOCK.y2-ty,'b']].sort((p,q)=>p[0]-q[0]);
@@ -821,10 +1052,43 @@
       else if(s==='t') ty = BLOCK.y1 - 4; else ty = BLOCK.y2 + 4;
       tx = clamp(tx, BOUNDS.minX, BOUNDS.maxX); ty = clamp(ty, BOUNDS.minY, BOUNDS.maxY);
     }
-    path = planPath(pos[myRole], { x:tx, y:ty });
+    return { x:tx, y:ty };
+  }
+
+  function walkTo(x, y){
+    if(!myRole) return;
+    const t = fixTarget(x, y);
+    mv[myRole].path = planPath(pos[myRole], t);
+    mv[myRole].wait = null;
+    lastInput = performance.now();
+    sendMove();
     const m = document.getElementById('tap-mark');
-    m.setAttribute('cx', tx); m.setAttribute('cy', ty);
+    m.setAttribute('cx', t.x); m.setAttribute('cy', t.y);
     m.classList.remove('ping'); void m.getBoundingClientRect(); m.classList.add('ping');
+  }
+
+  function wanderStep(role, dt){
+    const st = mv[role];
+    if(st.path.length) return false;
+    if(st.wait === null) st.wait = 0.8 + Math.random() * 2.6;
+    st.wait -= dt;
+    if(st.wait > 0) return false;
+    st.wait = null;
+    const t = fixTarget(
+      BOUNDS.minX + Math.random() * (BOUNDS.maxX - BOUNDS.minX),
+      BOUNDS.minY + Math.random() * (BOUNDS.maxY - BOUNDS.minY)
+    );
+    st.path = planPath(pos[role], t);
+    return true;
+  }
+
+  function followPath(role, dt){
+    const st = mv[role], p = pos[role];
+    if(!st.path.length) return false;
+    const t = st.path[0], dx = t.x - p.x, dy = t.y - p.y, d = Math.hypot(dx, dy), step = SPEED * dt;
+    if(d <= step){ p.x = t.x; p.y = t.y; st.path.shift(); }
+    else { p.x += dx / d * step; p.y += dy / d * step; }
+    return true;
   }
 
   function applyAvatar(role){
@@ -844,52 +1108,62 @@
     const el = document.getElementById('av-'+role);
     if(el) el.classList.toggle('walking', on);
   }
-  function sendPos(){
-    if(!db || !roomId || !myRole) return;
+
+  // positions are shared as a start point plus a short list of waypoints, so the other device walks the same route
+  function sendMove(){
+    if(!db || !myRole) return;
     const p = pos[myRole];
-    try{ db.ref('rooms/'+roomId+'/pos/'+myRole).set({ x:Math.round(p.x), y:Math.round(p.y) }).catch(()=>{}); }catch(e){}
+    const payload = {
+      x: Math.round(p.x), y: Math.round(p.y),
+      path: mv[myRole].path.map(q => Math.round(q.x) + ',' + Math.round(q.y)).join(';'),
+      ts: Date.now()
+    };
+    try{ db.ref('rooms/'+homeId+'/pos/'+myRole).set(payload).catch(()=>{}); }catch(e){}
+  }
+  function parsePath(str){
+    if(typeof str !== 'string' || !str) return [];
+    return str.split(';').map(s => {
+      const a = s.split(',');
+      return { x:clamp(Number(a[0]), BOUNDS.minX, BOUNDS.maxX), y:clamp(Number(a[1]), BOUNDS.minY, BOUNDS.maxY) };
+    }).filter(q => isFinite(q.x) && isFinite(q.y));
   }
 
   function stepMine(dt, now){
-    const p = pos[myRole];
+    const st = mv[myRole], p = pos[myRole];
     let vx = (keys.right?1:0) - (keys.left?1:0), vy = (keys.down?1:0) - (keys.up?1:0);
-    let moving = false;
+    let moving = false, keyMoving = false;
     if(vx || vy){
-      path = [];
+      st.path = []; st.wait = null; lastInput = now;
       const len = Math.hypot(vx, vy); vx /= len; vy /= len;
-      let nx = clamp(p.x + vx*SPEED*dt, BOUNDS.minX, BOUNDS.maxX);
-      let ny = clamp(p.y + vy*SPEED*dt, BOUNDS.minY, BOUNDS.maxY);
+      let nx = clamp(p.x + vx*SPEED*1.25*dt, BOUNDS.minX, BOUNDS.maxX);
+      let ny = clamp(p.y + vy*SPEED*1.25*dt, BOUNDS.minY, BOUNDS.maxY);
       if(inBlock(nx, ny)){
         if(!inBlock(nx, p.y)) ny = p.y; else if(!inBlock(p.x, ny)) nx = p.x; else { nx = p.x; ny = p.y; }
       }
-      p.x = nx; p.y = ny; moving = true;
-    } else if(path.length){
-      const t = path[0], dx = t.x - p.x, dy = t.y - p.y, d = Math.hypot(dx, dy), step = SPEED*dt;
-      if(d <= step){ p.x = t.x; p.y = t.y; path.shift(); }
-      else { p.x += dx/d*step; p.y += dy/d*step; }
-      moving = true;
+      p.x = nx; p.y = ny; moving = true; keyMoving = true;
+      if(now - lastKeySend > 250){ lastKeySend = now; sendMove(); }
+    } else if(st.path.length){
+      moving = followPath(myRole, dt);
+    } else if(!REDUCED && now - lastInput > IDLE_BEFORE_WANDER){
+      if(wanderStep(myRole, dt)) sendMove();
     }
-    if(moving && now - lastSend > 110){ lastSend = now; sendPos(); }
-    if(!moving && wasMoving) sendPos();
-    wasMoving = moving;
-    setWalking(myRole, moving);
+    if(!keyMoving && wasKeyMoving) sendMove();
+    wasKeyMoving = keyMoving;
+    setWalking(myRole, moving || st.path.length > 0);
   }
 
-  function stepOther(dt){
-    const other = myRole === 'dog' ? 'cat' : 'dog';
-    const r = remote[other], p = pos[other];
-    if(!r) return;
-    const dx = r.x - p.x, dy = r.y - p.y, d = Math.hypot(dx, dy);
-    if(d < 0.4){ setWalking(other, false); return; }
-    const f = Math.min(1, 9*dt);
-    p.x += dx*f; p.y += dy*f;
-    setWalking(other, d > 2.5);
+  function stepOther(dt, now){
+    const o = myRole === 'dog' ? 'cat' : 'dog';
+    const st = mv[o];
+    if(st.path.length) followPath(o, dt);
+    else if(!REDUCED && now - remoteSeen[o] > 25000) wanderStep(o, dt);   // friend is offline: keep them strolling anyway
+    setWalking(o, st.path.length > 0);
   }
 
   function tick(now){
     const dt = Math.min(0.05, (now - lastFrame) / 1000);
     lastFrame = now;
-    if(myRole){ stepMine(dt, now); stepOther(dt); }
+    if(myRole){ stepMine(dt, now); stepOther(dt, now); }
     applyAvatar('dog'); applyAvatar('cat');
     sortLayer('layer-behind'); sortLayer('layer-front');
     requestAnimationFrame(tick);
@@ -898,7 +1172,7 @@
   function startWalking(){
     if(loopOn) return;
     loopOn = true;
-    db.ref('rooms/'+roomId+'/pos').on('value', snap => {
+    db.ref('rooms/'+homeId+'/pos').on('value', snap => {
       const v = snap.val() || {};
       ['dog','cat'].forEach(r => {
         const q = v[r];
@@ -906,53 +1180,128 @@
         const x = clamp(q.x, BOUNDS.minX, BOUNDS.maxX), y = clamp(q.y, BOUNDS.minY, BOUNDS.maxY);
         if(r === myRole){
           if(!restored){ pos[r].x = x; pos[r].y = y; }
-        } else {
-          if(!remote[r]){ pos[r].x = x; pos[r].y = y; }
-          remote[r] = { x, y };
+          return;
         }
+        if(remoteTs[r] === q.ts) return;
+        remoteTs[r] = q.ts;
+        remoteSeen[r] = performance.now();
+        if(!remoteInit[r] || Math.hypot(pos[r].x - x, pos[r].y - y) > 50){ pos[r].x = x; pos[r].y = y; remoteInit[r] = true; }
+        const pts = parsePath(q.path);
+        mv[r].path = pts.length ? pts : [{ x:x, y:y }];
+        mv[r].wait = null;
       });
       restored = true;
     });
     lastFrame = performance.now();
+    lastInput = lastFrame;
     requestAnimationFrame(tick);
 
-    store.get('hint-seen').then(r => {
+    store.get('hint-seen-2').then(r => {
       if(r && r.value) return;
-      store.set('hint-seen', '1');
-      setTimeout(() => showToast('🐾 Tap the floor to walk · blue book = chat', 3600), 900);
+      store.set('hint-seen-2', '1');
+      setTimeout(() => showToast('🐾 Tap the floor to walk · every to-do adds a book · find the blue one 📘', 4600), 900);
     });
   }
 
-  // tap the floor to walk; tap your friend to hear them
+  // tap a thing, or tap the floor to walk; tap a walker to hear them
   const scene = document.getElementById('library-scene');
   scene.addEventListener('click', e => {
-    if(e.target.closest('.hot')) return;
+    const hot = e.target.closest('.hot');
+    if(hot){ openView(hot.getAttribute('data-open')); return; }
     const av = e.target.closest('.avatar');
     if(av){ hop(av.getAttribute('data-role')); return; }
     const pt = scene.createSVGPoint();
     pt.x = e.clientX; pt.y = e.clientY;
     const p = pt.matrixTransform(scene.getScreenCTM().inverse());
-    if(p.y < 380) return;
+    if(p.y < 372) return;
     walkTo(p.x, p.y);
   });
+  scene.addEventListener('keydown', e => {
+    const hot = e.target.closest && e.target.closest('.hot');
+    if(hot && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); openView(hot.getAttribute('data-open')); }
+  });
 
-  // arrow keys / WASD also work on a computer
+  // arrow keys / WASD also walk on a computer
   const KEYMAP = { ArrowLeft:'left', a:'left', A:'left', ArrowRight:'right', d:'right', D:'right', ArrowUp:'up', w:'up', W:'up', ArrowDown:'down', s:'down', S:'down' };
   document.addEventListener('keydown', e => {
     const k = KEYMAP[e.key];
-    if(!k || openName || !myRole || e.metaKey || e.ctrlKey || e.altKey) return;
+    if(!k || !myRole || e.metaKey || e.ctrlKey || e.altKey) return;
+    if(openName && !isDesktop()) return;
     const t = e.target;
-    if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'BUTTON')) return;
     keys[k] = true;
     e.preventDefault();
   });
   document.addEventListener('keyup', e => { const k = KEYMAP[e.key]; if(k) keys[k] = false; });
   window.addEventListener('blur', () => { keys = {}; });
 
+  document.addEventListener('keydown', e => {
+    if(e.key !== 'Escape') return;
+    const lb = document.getElementById('lightbox');
+    if(lb.classList.contains('show')){ closeLightbox(); return; }
+    if(openName && !isDesktop()) closeView();
+  });
+
+  // ---------- chat: the secret code ----------
+  function attachChat(code){
+    detachChat();
+    chatId = code;
+    messagesRef = db.ref('rooms/'+chatId+'/messages').limitToLast(300);
+    messagesRef.on('value', snap => {
+      const arr = [];
+      snap.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
+      messages = arr;
+      sweepExpired();
+      renderMessages();
+      if(openName === 'chat') markChatSeen(); else updateBookBadge();
+    });
+    settingsRef = db.ref('rooms/'+chatId+'/settings');
+    settingsRef.on('value', snap => { settings = snap.val() || {}; renderVanish(); });
+    loadSeen();
+  }
+
+  function detachChat(){
+    if(messagesRef){ messagesRef.off(); messagesRef = null; }
+    if(settingsRef){ settingsRef.off(); settingsRef = null; }
+    messages = []; settings = {}; chatId = null;
+  }
+
+  function syncChatPane(){
+    const unlocked = !!chatId;
+    document.getElementById('chat-gate').style.display = unlocked ? 'none' : 'flex';
+    document.getElementById('chat-body').style.display = unlocked ? 'flex' : 'none';
+    document.getElementById('lock-btn').style.display = unlocked ? '' : 'none';
+    if(unlocked){ renderMessages(); renderVanish(); }
+  }
+
+  async function submitChatCode(){
+    const input = document.getElementById('chat-code-input');
+    const err = document.getElementById('chat-code-error');
+    const val = input.value.trim();
+    if(!val){ err.innerText = 'Type a code first.'; return; }
+    err.innerText = '';
+    const code = sanitizeRoomId(val);
+    if(document.getElementById('chat-remember').checked) await store.set('chat-code', code);
+    else await store.delete('chat-code');
+    input.value = '';
+    attachChat(code);
+    syncChatPane();
+    scrollChatDown();
+  }
+
+  async function lockChat(){
+    await store.delete('chat-code');
+    detachChat();
+    clearPhoto();
+    syncChatPane();
+    updateBookBadge();
+    showToast('🔒 Blue book locked');
+  }
+
   // ---------- unread badge on the blue book ----------
   async function loadSeen(){
     try{
-      const r = await store.get('chat-seen-'+roomId);
+      const r = await store.get('chat-seen-'+chatId);
       lastSeenTime = (r && r.value) ? Number(r.value) : Date.now();
     }catch(e){
       lastSeenTime = Date.now();
@@ -960,55 +1309,162 @@
     updateBookBadge();
   }
 
+  function visibleMessages(){
+    const now = Date.now();
+    return messages.filter(m => !(m.exp && m.exp <= now));
+  }
+
   function markChatSeen(){
-    if(messages.length){
-      lastSeenTime = Math.max(lastSeenTime, ...messages.map(m => m.time || 0));
+    if(!chatId) return;
+    const vis = visibleMessages();
+    if(vis.length){
+      lastSeenTime = Math.max(lastSeenTime, ...vis.map(m => m.time || 0));
     }
-    store.set('chat-seen-'+roomId, String(lastSeenTime));
+    store.set('chat-seen-'+chatId, String(lastSeenTime));
     updateBookBadge();
   }
 
   function updateBookBadge(){
-    const n = openName === 'chat'
+    const b = document.getElementById('book-badge'), n = document.getElementById('book-badge-n');
+    if(!b || !n) return;
+    const count = (!chatId || (openName === 'chat'))
       ? 0
-      : messages.filter(m => m.sender !== myRole && (m.time || 0) > lastSeenTime).length;
-    document.getElementById('book-badge').style.display = n > 0 ? '' : 'none';
-    document.getElementById('book-badge-n').textContent = n > 9 ? '9+' : String(n);
+      : visibleMessages().filter(m => m.sender !== myRole && (m.time || 0) > lastSeenTime).length;
+    b.style.display = count > 0 ? '' : 'none';
+    n.textContent = count > 9 ? '9+' : String(count);
   }
 
-  // ---------- chat ----------
-  function attachMessagesListener(){
-    db.ref('rooms/'+roomId+'/messages').limitToLast(300).on('value', snap => {
-      const arr = [];
-      snap.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
-      messages = arr;
-      renderMessages();
-      if(openName === 'chat') markChatSeen(); else updateBookBadge();
+  // ---------- chat: vanish after 24h ----------
+  function renderVanish(){
+    const btn = document.getElementById('vanish-btn');
+    if(!btn) return;
+    const mine = !!(settings[myRole] && settings[myRole].vanish);
+    btn.classList.toggle('on', mine);
+    btn.setAttribute('aria-pressed', mine ? 'true' : 'false');
+    const other = myRole === 'dog' ? 'cat' : 'dog';
+    const theirs = !!(settings[other] && settings[other].vanish);
+    const name = (profiles[other] && profiles[other].name) || (other === 'dog' ? 'Pup' : 'Kitty');
+    document.getElementById('partner-vanish').textContent = `${name}: vanish ${theirs ? 'on' : 'off'}`;
+  }
+
+  async function toggleVanish(){
+    if(!chatId) return;
+    const next = !(settings[myRole] && settings[myRole].vanish);
+    try{
+      await db.ref('rooms/'+chatId+'/settings/'+myRole).set({ vanish: next });
+      showToast(next ? '⏳ Your new messages vanish after 24h' : 'Vanish is off');
+    }catch(e){ showToast('⚠️ Could not change that'); }
+  }
+
+  function leftText(ms){
+    if(ms <= 0) return 'gone';
+    const h = Math.floor(ms / 3600000);
+    if(h >= 1) return h + 'h left';
+    return Math.max(1, Math.ceil(ms / 60000)) + 'm left';
+  }
+
+  function sweepExpired(){
+    if(!db || !chatId) return;
+    const now = Date.now();
+    messages.forEach(m => {
+      if(m.exp && m.exp <= now){
+        try{ db.ref('rooms/'+chatId+'/messages/'+m.id).remove().catch(()=>{}); }catch(e){}
+      }
     });
   }
 
+  setInterval(() => {
+    if(!chatId) return;
+    const before = document.querySelectorAll('#chat-scroll .msg-row').length;
+    sweepExpired();
+    if(visibleMessages().length !== before && messages.length) renderMessages();
+    document.querySelectorAll('#chat-scroll [data-exp]').forEach(el => {
+      el.textContent = '⏳ ' + leftText(Number(el.getAttribute('data-exp')) - Date.now());
+    });
+    updateBookBadge();
+  }, 30000);
+
+  // ---------- chat: photos ----------
+  function readImage(file){
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const im = new Image();
+      im.onload = () => {
+        function shrink(max, q){
+          const s = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
+          const w = Math.max(1, Math.round(im.naturalWidth * s)), h = Math.max(1, Math.round(im.naturalHeight * s));
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          c.getContext('2d').drawImage(im, 0, 0, w, h);
+          return c.toDataURL('image/jpeg', q);
+        }
+        let out = shrink(640, 0.6);
+        if(out.length > 300000) out = shrink(480, 0.5);
+        URL.revokeObjectURL(url);
+        resolve(out);
+      };
+      im.onerror = () => { URL.revokeObjectURL(url); reject(new Error('bad image')); };
+      im.src = url;
+    });
+  }
+
+  async function onPhotoPicked(e){
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    if(!/^image\//.test(file.type)){ showToast('⚠️ That is not a photo'); return; }
+    try{
+      pendingImg = await readImage(file);
+      document.getElementById('pending-img').src = pendingImg;
+      document.getElementById('pending-photo').style.display = 'flex';
+    }catch(err){ showToast('⚠️ Could not read that photo'); }
+  }
+
+  function clearPhoto(){
+    pendingImg = null;
+    const p = document.getElementById('pending-photo');
+    if(p) p.style.display = 'none';
+  }
+
+  function openLightbox(src){
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('show');
+  }
+  function closeLightbox(){
+    document.getElementById('lightbox').classList.remove('show');
+  }
+
+  // ---------- chat ----------
   function renderMessages(){
     const scroll = document.getElementById('chat-scroll');
     const wasNearBottom = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 80;
+    const list = visibleMessages();
 
-    if(messages.length === 0){
+    if(list.length === 0){
       scroll.innerHTML = `<div class="empty-state" id="chat-empty"><span class="emoji">🐾💬</span>Nothing said yet. Say hi first!</div>`;
       return;
     }
 
-    scroll.innerHTML = messages.map(m => {
+    const IMG_OK = /^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+\/=]+$/;
+    scroll.innerHTML = list.map(m => {
       const mine = m.sender === myRole;
-      const emoji = m.sender === 'dog' ? '🐶' : '🐱';
+      const role = m.sender === 'dog' ? 'dog' : 'cat';
       const time = new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      const hasImg = typeof m.img === 'string' && IMG_OK.test(m.img);
+      const text = m.text ? escapeHtml(m.text) : '';
+      const inner = hasImg
+        ? `<img class="chat-img" src="${m.img}" alt="Photo" onclick="openLightbox(this.src)">${text ? `<div class="cap">${text}</div>` : ''}`
+        : text;
+      const left = m.exp ? ` · <span data-exp="${Number(m.exp)}">⏳ ${leftText(m.exp - Date.now())}</span>` : '';
       return `
         <div class="msg-row ${mine ? 'me' : 'them'}">
-          <div class="mini-tag ${m.sender}">${emoji}</div>
+          <div class="mini-tag ${role}">${face(role)}</div>
           <div>
             <div class="bubble-wrap">
-              <div class="bubble">${escapeHtml(m.text)}</div>
+              <div class="bubble${hasImg ? ' has-img' : ''}">${inner}</div>
               <button class="msg-del" onclick="deleteMessage('${m.id}')" title="Delete">🗑</button>
             </div>
-            <div class="msg-time" style="text-align:${mine ? 'right' : 'left'}">${time}</div>
+            <div class="msg-time" style="text-align:${mine ? 'right' : 'left'}">${time}${left}</div>
           </div>
         </div>`;
     }).join('');
@@ -1019,12 +1475,18 @@
   }
 
   async function sendMessage(){
+    if(!chatId) return;
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
-    if(!text) return;
+    if(!text && !pendingImg) return;
     input.value = '';
+    const msg = { sender: myRole, time: Date.now() };
+    if(text) msg.text = text;
+    if(pendingImg) msg.img = pendingImg;
+    if(settings[myRole] && settings[myRole].vanish) msg.exp = Date.now() + DAY;
+    clearPhoto();
     try{
-      await db.ref('rooms/'+roomId+'/messages').push({ sender: myRole, text, time: Date.now() });
+      await db.ref('rooms/'+chatId+'/messages').push(msg);
     }catch(e){
       showToast('⚠️ Could not send — try again');
     }
@@ -1033,7 +1495,7 @@
   async function deleteMessage(id){
     if(!confirm('Delete this message for both of you?')) return;
     try{
-      await db.ref('rooms/'+roomId+'/messages/'+id).remove();
+      await db.ref('rooms/'+chatId+'/messages/'+id).remove();
       showToast('🗑 Deleted');
     }catch(e){ showToast('⚠️ Could not delete'); }
   }
@@ -1058,7 +1520,7 @@
 
   function attachPlannerListener(){
     if(plannerRef) plannerRef.off();
-    plannerRef = db.ref('rooms/'+roomId+'/planner/'+dateKey(currentDate));
+    plannerRef = db.ref('rooms/'+homeId+'/planner/'+dateKey(currentDate));
     plannerRef.on('value', snap => {
       const arr = [];
       snap.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
@@ -1075,13 +1537,13 @@
       return;
     }
     const sorted = [...tasks].sort((a,b) => (a.time || '').localeCompare(b.time || ''));
-    const whoIcon = { dog:'🐶', cat:'🐱', both:'🐾' };
+    const whoIcon = t => (t.who === 'dog' || t.who === 'cat') ? face(t.who) : '🐾';
     list.innerHTML = sorted.map(t => `
       <div class="task ${t.done ? 'done' : ''}">
         <button class="paw-check" onclick="toggleTask('${t.id}')">${t.done ? '🐾' : ''}</button>
         <div class="task-time">${t.time || ''}</div>
         <div class="task-title">${escapeHtml(t.title)}</div>
-        <div class="task-who">${whoIcon[t.who] || '🐾'}</div>
+        <div class="task-who">${whoIcon(t)}</div>
         <button class="task-del" onclick="deleteTask('${t.id}')">✕</button>
       </div>
     `).join('');
@@ -1093,7 +1555,7 @@
     if(!title) return;
     document.getElementById('new-title').value = '';
     try{
-      await db.ref('rooms/'+roomId+'/planner/'+dateKey(currentDate)).push({ time, title, who: pickedWho, done:false });
+      await db.ref('rooms/'+homeId+'/planner/'+dateKey(currentDate)).push({ time, title, who: pickedWho, done:false });
     }catch(e){ showToast('⚠️ Could not save — try again'); }
   }
 
@@ -1101,17 +1563,18 @@
     const t = tasks.find(x => x.id === id);
     if(!t) return;
     try{
-      await db.ref('rooms/'+roomId+'/planner/'+dateKey(currentDate)+'/'+id).update({ done: !t.done });
+      await db.ref('rooms/'+homeId+'/planner/'+dateKey(currentDate)+'/'+id).update({ done: !t.done });
     }catch(e){ showToast('⚠️ Could not update'); }
   }
 
   async function deleteTask(id){
     try{
-      await db.ref('rooms/'+roomId+'/planner/'+dateKey(currentDate)+'/'+id).remove();
+      await db.ref('rooms/'+homeId+'/planner/'+dateKey(currentDate)+'/'+id).remove();
       showToast('🗑 Removed');
     }catch(e){ showToast('⚠️ Could not delete'); }
   }
 
+  renderBooks(false);   // shelves start with just the blue book
   boot();
 </script>
 </body>
