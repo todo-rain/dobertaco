@@ -211,6 +211,18 @@
   .desk-only{ display:none; margin-left:auto; }
 
   .chat-gate .lock{ font-size:40px; line-height:1; }
+  .login .login-faces{ display:flex; gap:14px; margin-bottom:2px; }
+  .login .login-faces .face{ width:84px; height:70px; padding:8px; border-radius:22px; box-sizing:content-box; background:var(--paper-soft); border:1px solid var(--line); box-shadow:0 6px 16px rgba(46,38,32,.12); }
+  .login .login-faces .face:first-child{ transform:rotate(-5deg); }
+  .login .login-faces .face:last-child{ transform:rotate(5deg); }
+  .google-btn{ display:flex; align-items:center; justify-content:center; gap:12px; min-width:250px; padding:13px 22px; border-radius:14px; border:1px solid #dadce0; background:#fff; color:#3c4043; font-family:'Nunito', sans-serif; font-weight:700; font-size:15px; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.14); transition:transform .15s ease, box-shadow .15s ease; }
+  .google-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,0,0,.2); }
+  .google-btn:active{ transform:scale(.98); }
+  .google-btn:disabled{ opacity:.6; cursor:wait; }
+  .tiny{ font-size:12px !important; opacity:.85; }
+  .login-error{ max-width:300px; }
+  .remember{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); cursor:pointer; margin-top:-4px; }
+  .remember input{ width:17px; height:17px; accent-color:var(--ink); cursor:pointer; }
 
   /* Chat */
   .chat-body{ flex:1; min-height:0; display:flex; flex-direction:column; }
@@ -393,6 +405,29 @@
     <p class="field-error" id="setup-error-detail"></p>
   </div>
 
+  <!-- LOGIN: only the two invited Google accounts get past the database rules -->
+  <div class="gate login" id="login-gate" style="display:none;">
+    <div class="login-faces">
+      <svg class="face" viewBox="-36 -86 72 60"><use href="#dog-head"/></svg>
+      <svg class="face" viewBox="-36 -86 72 60"><use href="#cat-head"/></svg>
+    </div>
+    <h1>Paws & Plans</h1>
+    <p>Just for the two of you. Sign in with your Google account to come in.</p>
+    <button class="google-btn" id="google-btn" onclick="signInGoogle()">
+      <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Sign in with Google
+    </button>
+    <p class="field-error login-error" id="login-error"></p>
+    <p class="tiny">You only do this once on each device.</p>
+  </div>
+
+  <div class="gate" id="denied-gate" style="display:none;">
+    <div style="font-size:44px;line-height:1">🔒</div>
+    <h1>This account isn’t invited</h1>
+    <p>You’re signed in as <b id="denied-email"></b>, but only the two invited Google accounts can open this library.</p>
+    <button class="primary-btn" onclick="signOutNow(true)">Use a different account</button>
+  </div>
+
   <div class="gate" id="gate" style="display:none;">
     <h1>Whose paws are these?</h1>
     <p>Pick who you are on this device.</p>
@@ -432,7 +467,7 @@
       <div class="meta-row">
         <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙 Dark</button>
         <span class="book-count" id="book-count" title="Every to-do adds a book to the To-Do shelf">📚 0</span>
-        <span class="switch-link" onclick="switchDevice()">switch role on this device</span>
+        <span><span class="switch-link" onclick="switchDevice()">switch role</span> · <span class="switch-link" onclick="signOutNow()">sign out</span></span>
       </div>
     </div>
 
@@ -484,6 +519,7 @@
           <h1>The blue book is locked</h1>
           <p>Type your secret code. You only need it once each time the page is opened or refreshed.</p>
           <input class="text-input" type="text" id="chat-code-input" placeholder="our-secret-code" maxlength="60" autocomplete="off" onkeydown="if(event.key==='Enter')submitChatCode()">
+          <label class="remember"><input type="checkbox" id="chat-remember"> Stay unlocked on this device</label>
           <p class="field-error" id="chat-code-error"></p>
           <button class="primary-btn" onclick="submitChatCode()">Open the book</button>
         </div>
@@ -497,6 +533,7 @@
             <span class="partner-state" id="partner-vanish"></span>
             <button class="more-btn" id="more-btn" onclick="toggleMenu(event)" aria-label="More options" title="More">⋯</button>
             <div class="menu" id="chat-menu">
+              <button id="remember-item" onclick="toggleRemember()">📌 Stay unlocked on this device</button>
               <button onclick="lockChat()">🔒 Lock the blue book</button>
               <hr>
               <button class="danger" onclick="wipeChat()">🧹 Wipe whole chat…</button>
@@ -603,7 +640,8 @@
 
   let db = null;
   let homeId = HOME_ROOM;
-  let chatId = null;         // lives in memory only: asked once per page open / refresh
+  let chatId = null;         // asked once per page open / refresh, unless this device is set to "stay unlocked"
+  let rememberOn = false;    // true while the chat code is kept on this device
   let myRole = null;
   let profiles = { dog: { name: 'Pup' }, cat: { name: 'Kitty' } };
   let messages = [];
@@ -872,8 +910,8 @@
     let blue = null;
     SHELF_XS.forEach((x, i) => {
       const rnd = mkRng(101 + i * 37);
-      const isBlue = (x === 1602);
-      if(isBlue) blue = { row:182, idx:5, plain:0, pos:null };
+      const isBlue = (x === 618);   // the shelf by the ladder, a short walk from the study table
+      if(isBlue) blue = { row:182, idx:3, plain:0, pos:null };
       s += caseSvg(x, rnd, { blue: isBlue ? blue : null });
     });
     // the to-do cases (start empty)
@@ -1356,10 +1394,10 @@
     lastFrame = performance.now();
     lastInput = lastFrame;
     requestAnimationFrame(tick);
-    store.get('hint-seen-3').then(r => {
+    store.get('hint-seen-4').then(r => {
       if(r && r.value) return;
-      store.set('hint-seen-3', '1');
-      setTimeout(() => showToast('🐾 Tap the floor to walk · find the one blue book 📘', 4800), 900);
+      store.set('hint-seen-4', '1');
+      setTimeout(() => showToast('🐾 Tap the floor to walk · the blue book 📘 hides by the ladder', 5200), 900);
     });
   }
 
@@ -1538,25 +1576,92 @@
 
   async function boot(){
     updateThemeBtn();
-    // The chat code is never kept on the device any more: forget any that an older version saved.
-    store.delete('chat-code');
     if(configIsPlaceholder()){
       $('setup-needed').style.display = 'flex';
       return;
     }
     try{
       firebase.initializeApp(firebaseConfig);
-      await firebase.auth().signInAnonymously();
       db = firebase.database();
     }catch(e){
       $('setup-needed').style.display = 'flex';
       $('setup-error-detail').innerText = 'Firebase error: ' + (e && e.message ? e.message : e);
       return;
     }
+    // Google sign-in. Firebase keeps you signed in on this device, so this is a one-time step.
+    firebase.auth().onAuthStateChanged(user => {
+      if(user){
+        if(!signedInStarted){ signedInStarted = true; authUser = user; onSignedIn(user); }
+      } else {
+        signedInStarted = false; authUser = null;
+        showLogin();
+      }
+    });
+  }
+
+  let authUser = null, signedInStarted = false;
+
+  function showLogin(){
+    ['gate', 'denied-gate'].forEach(id => { $(id).style.display = 'none'; });
+    $('main').style.display = 'none';
+    $('login-gate').style.display = 'flex';
+  }
+
+  async function onSignedIn(user){
+    $('login-gate').style.display = 'none';
+    // Is this account allowed in? (the database rules decide)
+    try{
+      await db.ref('rooms/'+homeId+'/profile').once('value');
+    }catch(e){
+      if(/permission|denied/i.test((e && (e.code || e.message)) || '')){
+        $('denied-email').textContent = user.email || 'this account';
+        $('denied-gate').style.display = 'flex';
+        return;
+      }
+    }
     let savedRole = null;
     try{ const r = await store.get('my-role'); savedRole = r && r.value; }catch(e){}
     if(savedRole){ myRole = savedRole; showMain(); }
     else { $('gate').style.display = 'flex'; }
+  }
+
+  function authMessage(code){
+    if(code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return '';
+    if(code === 'auth/unauthorized-domain') return 'This website’s address isn’t allowed yet. In Firebase: Authentication → Settings → Authorized domains → add it.';
+    if(code === 'auth/operation-not-allowed') return 'Google sign-in is switched off. In Firebase: Authentication → Sign-in method → turn on Google.';
+    if(code === 'auth/network-request-failed') return 'No connection — try again.';
+    return 'Couldn’t sign in' + (code ? ' (' + code.replace('auth/', '') + ')' : '') + '. If you opened this link inside another app, open it in Chrome or Safari instead.';
+  }
+
+  async function signInGoogle(){
+    const err = $('login-error'), btn = $('google-btn');
+    err.textContent = '';
+    btn.disabled = true;
+    const auth = firebase.auth();
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt:'select_account' });
+    try{
+      await auth.signInWithPopup(provider);
+    }catch(e){
+      let code = (e && e.code) || '';
+      if(code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment'){
+        try{ await auth.signInWithRedirect(provider); return; }
+        catch(e2){ code = (e2 && e2.code) || code; }
+      }
+      err.textContent = authMessage(code);
+    }
+    btn.disabled = false;
+  }
+
+  async function signOutNow(skipAsk){
+    if(skipAsk !== true){
+      const who = escapeHtml((authUser && authUser.email) || 'this account');
+      const ok = await openDialog({ icon:'👋', title:'Sign out?', body:`You’re signed in as <b>${who}</b>. You’ll need to sign in with Google again to come back.`, confirmText:'Sign out', cancelText:'Stay' });
+      if(!ok) return;
+    }
+    await store.delete('chat-code');
+    try{ await firebase.auth().signOut(); }catch(e){}
+    location.reload();
   }
 
   async function selectRole(role){
@@ -1573,7 +1678,7 @@
     location.reload();
   }
 
-  function showMain(){
+  async function showMain(){
     $('main').style.display = 'flex';
     attachProfileListener();
     attachPlannerListener();
@@ -1581,7 +1686,16 @@
     renderDateLabel();
     measureScene();
     startWalking();
-    if(isDesktop()) openView('planner');
+    // If this device was set to "stay unlocked", go straight into the blue book.
+    let saved = null;
+    try{ const r = await store.get('chat-code'); saved = r && r.value; }catch(e){}
+    if(saved){
+      rememberOn = true;
+      attachChat(saved);
+      openView('chat');
+    } else if(isDesktop()){
+      openView('planner');
+    }
   }
 
   function attachProfileListener(){
@@ -1709,12 +1823,36 @@
     if(!val){ err.innerText = 'Type a code first.'; return; }
     err.innerText = '';
     input.value = '';
-    attachChat(sanitizeRoomId(val));
+    const code = sanitizeRoomId(val);
+    if($('chat-remember').checked){ rememberOn = true; store.set('chat-code', code); }
+    else { rememberOn = false; store.delete('chat-code'); }
+    attachChat(code);
     syncChatPane();
     scrollChatDown();
   }
+  function updateRememberItem(){
+    const b = $('remember-item');
+    if(b) b.textContent = rememberOn ? '✅ Staying unlocked on this device' : '📌 Stay unlocked on this device';
+  }
+  function toggleRemember(){
+    closeMenu();
+    if(!chatId) return;
+    if(rememberOn){
+      rememberOn = false;
+      store.delete('chat-code');
+      showToast('You’ll be asked for the code next time');
+    } else {
+      rememberOn = true;
+      store.set('chat-code', chatId);
+      showToast('📌 This device stays unlocked');
+    }
+    updateRememberItem();
+  }
   function lockChat(){
     closeMenu();
+    rememberOn = false;
+    store.delete('chat-code');
+    $('chat-remember').checked = false;
     detachChat();
     clearPhoto();
     syncChatPane();
@@ -1724,6 +1862,7 @@
 
   function toggleMenu(e){
     e.stopPropagation();
+    updateRememberItem();
     $('chat-menu').classList.toggle('show');
   }
   function closeMenu(){ const m = $('chat-menu'); if(m) m.classList.remove('show'); }
