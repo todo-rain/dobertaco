@@ -1,6 +1,6 @@
 // Paws & Plans: tiny service worker. Makes the app installable and loads it faster.
 // Change VERSION whenever you upload a new index.html and want phones to refresh their saved copy.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL = 'paws-shell-' + VERSION;
 const LIBS  = 'paws-libs-' + VERSION;
 const SHELL_FILES = ['./', './index.html'];
@@ -73,4 +73,10 @@ self.addEventListener('fetch', e => {
       }
     })());
   }
+});
+
+// Tapping a notification brings the app to the front.
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type:'window', includeUncontrolled:true }).then(cs => cs.length ? cs[0].focus() : self.clients.openWindow('./')));
 });
