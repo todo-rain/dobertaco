@@ -445,6 +445,18 @@
     .compose{ padding-bottom:calc(14px + env(safe-area-inset-bottom)); }
   }
 
+  /* pup mode: just the chat */
+  .pupmode .header, .pupmode .scene-wrap, .pupmode #view-planner{ display:none !important; }
+  .pupmode #view-chat{ width:100%; border-left:0; }
+  .card.pupmode{ max-width:520px; }
+  .pup-in #view-chat .back-btn, .pup-in #view-chat .desk-only{ display:none !important; }
+  .typing{ display:flex; align-items:center; gap:8px; padding:5px 16px; font-size:12px; color:var(--ink-soft); background:var(--paper); flex:none; }
+  .dots{ display:inline-flex; gap:3px; }
+  .dots i{ width:5px; height:5px; border-radius:50%; background:var(--ink-soft); animation:dotb 1.1s infinite ease-in-out; }
+  .dots i:nth-child(2){ animation-delay:.15s; } .dots i:nth-child(3){ animation-delay:.3s; }
+  @keyframes dotb{ 0%,60%,100%{ transform:translateY(0); opacity:.4; } 30%{ transform:translateY(-3px); opacity:1; } }
+  .tick{ margin-left:5px; letter-spacing:-3px; font-size:11px; }
+  .tick.seen{ color:#3B9BFF; }
   ::-webkit-scrollbar{ width:6px; }
   ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:10px; }
 
@@ -616,6 +628,7 @@
             <div class="chat-list" id="chat-list"></div>
             <div class="empty-state" id="chat-empty"><span class="emoji">🐾💬</span>Nothing said yet. Say hi first!</div>
           </div>
+          <div class="typing" id="typing" style="display:none"><span class="dots"><i></i><i></i><i></i></span><span id="typing-name"></span></div>
           <div class="reply-bar" id="reply-bar" style="display:none">
             <div class="reply-stripe"></div>
             <div class="reply-txt"><b id="reply-name"></b><span id="reply-snip"></span></div>
@@ -628,7 +641,7 @@
           </div>
           <div class="compose">
             <button class="photo-btn" onclick="openPhotoChooser()" title="Take or add a photo">📷</button>
-            <input type="text" id="chat-input" placeholder="Type something sweet…" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage();else if(event.key==='Escape'&&replyTo){event.stopPropagation();cancelReply();}">
+            <input type="text" id="chat-input" placeholder="Type something sweet…" maxlength="500" oninput="onTyping()" onkeydown="if(event.key==='Enter')sendMessage();else if(event.key==='Escape'&&replyTo){event.stopPropagation();cancelReply();}">
             <button class="send-btn" onclick="sendMessage()">➤</button>
           </div>
           <input type="file" id="photo-input" accept="image/*" hidden onchange="onPhotoPicked(event)">
@@ -732,6 +745,9 @@
   let pendingImg = null;
   let replyTo = null;
   let mainShown = false;
+  let pupMode = false;
+  let typingRef = null, seenRef = null, typingState = {}, seenState = {};
+  let iAmTyping = false, lastTypingWrite = 0, typingTimer = 0, typingHide = 0, mySeenWritten = 0;
 
 
   // 12-hour clock, e.g. "3:45 PM"
@@ -1302,8 +1318,8 @@ function buildFloor(){
   }
   function randomTarget(from){
     for(let i = 0; i < 30; i++){
-      const near = Math.random() < 0.7;
-      const x = near ? clamp(from.x + (Math.random() - .5) * 700, WALK.minX, WALK.maxX) : WALK.minX + Math.random() * (WALK.maxX - WALK.minX);
+      const near = Math.random() < 0.95;
+      const x = near ? clamp(from.x + (Math.random() - .5) * 380, WALK.minX, WALK.maxX) : WALK.minX + Math.random() * (WALK.maxX - WALK.minX);
       const y = WALK.minY + Math.random() * (WALK.maxY - WALK.minY);
       if(isFree(x, y)) return { x:x, y:y };
     }
@@ -1311,7 +1327,7 @@ function buildFloor(){
   }
 
   const SPEED = 112;
-  const IDLE_BEFORE_WANDER = 2500;
+  const IDLE_BEFORE_WANDER = 7000;
   const pos = { x:TX - 140, y:632 };
   let path = [], wait = null, look = 1, lookShown = 1;
   let keys = {};
@@ -1356,7 +1372,7 @@ function buildFloor(){
   }
   function wanderStep(dt){
     if(path.length) return;
-    if(wait === null) wait = 0.8 + Math.random() * 2.6;
+    if(wait === null) wait = 12 + Math.random() * 18;
     wait -= dt;
     if(wait > 0) return;
     wait = null;
@@ -1440,7 +1456,7 @@ function buildFloor(){
   }
   // The library only runs while you can actually see it (saves battery and keeps the chat snappy).
   function syncRunning(){
-    const covered = !!openName && !isDesktop();
+    const covered = (!!openName && !isDesktop()) || pupMode;
     setRunning(loopReady && !document.hidden && !covered);
     clearTimeout(coverTimer);
     if(covered) coverTimer = setTimeout(() => wrapEl.classList.add('covered'), 650);
@@ -1816,7 +1832,14 @@ function buildFloor(){
       if(chatId){ markChatSeen(); scrollChatDown(); }
       else setTimeout(() => { const i = $('chat-code-input'); if(i && !isTouch()) i.focus(); }, 80);
     }
+    syncMode();
     syncRunning();
+  }
+  function syncMode(){
+    const pup = openName === 'chat' && (chatId ? myRole : pendingRole) === 'dog';
+    pupMode = pup;
+    $('card').classList.toggle('pupmode', pup);
+    $('card').classList.toggle('pup-in', pup && !!chatId);
   }
   function closeView(){
     if(openName === 'chat') markChatSeen();
@@ -1829,6 +1852,7 @@ function buildFloor(){
       renderDateLabel();
       attachPlannerListener();
     }
+    syncMode();
     syncRunning();
   }
   window.matchMedia('(min-width: 900px)').addEventListener('change', e => {
@@ -1851,6 +1875,8 @@ function buildFloor(){
   });
   // Optional: tuck the chat away whenever you leave the app
   document.addEventListener('visibilitychange', () => {
+    if(document.hidden) stopTyping();
+    else if(openName === 'chat') markChatSeen();
     if(!document.hidden || !hideOnLeave || openName !== 'chat') return;
     if(isDesktop()) openView('planner'); else closeView();
   });
@@ -1882,7 +1908,8 @@ function buildFloor(){
     openView('chat');
   }
   function setChatRole(role){
-    myRole = role;
+    stopTyping();
+    myRole = role; mySeenWritten = 0;
     if(rememberOn) store.set('chat-role', role);
     cancelReply();
     resetList();
@@ -1890,6 +1917,7 @@ function buildFloor(){
     renderVanish();
     renderChatMe();
     updateBookBadge();
+    updateTicks(); renderTyping(); syncMode();
   }
   function renderChatMe(){
     const el = $('chat-me');
@@ -1904,6 +1932,11 @@ function buildFloor(){
     listenMessages();
     settingsRef = db.ref('rooms/'+chatId+'/settings');
     settingsRef.on('value', snap => { settings = snap.val() || {}; renderVanish(); });
+    typingRef = db.ref('rooms/'+chatId+'/typing');
+    typingRef.on('value', snap => { typingState = snap.val() || {}; renderTyping(true); });
+    seenRef = db.ref('rooms/'+chatId+'/seen');
+    seenRef.on('value', snap => { seenState = snap.val() || {}; updateTicks(); });
+    mySeenWritten = 0;
     loadSeen();
     renderChatMe();
   }
@@ -1921,6 +1954,11 @@ function buildFloor(){
     });
   }
   function detachChat(){
+    if(chatId) stopTyping();
+    if(typingRef){ typingRef.off(); typingRef = null; }
+    if(seenRef){ seenRef.off(); seenRef = null; }
+    typingState = {}; seenState = {};
+    renderTyping();
     if(messagesRef){ messagesRef.off(); messagesRef = null; }
     if(settingsRef){ settingsRef.off(); settingsRef = null; }
     messages = []; settings = {}; chatId = null; notifySeen = null;
@@ -1933,6 +1971,7 @@ function buildFloor(){
     $('chat-gate').style.display = unlocked ? 'none' : 'flex';
     $('chat-body').style.display = unlocked ? 'flex' : 'none';
     if(unlocked){ renderMessages(); renderVanish(); renderChatMe(); renderReplyBar(); }
+    syncMode();
   }
   function submitChatCode(){
     const input = $('chat-code-input'), err = $('chat-code-error');
@@ -1976,6 +2015,7 @@ function buildFloor(){
   }
   function lockChat(){
     closeMenu();
+    const wasPup = pupMode;
     rememberOn = false;
     store.delete('chat-code'); store.delete('chat-role');
     $('chat-remember').checked = false;
@@ -1985,6 +2025,7 @@ function buildFloor(){
     syncChatPane();
     updateBookBadge();
     showToast('🔒 Locked');
+    if(wasPup) closeView();
   }
 
   function toggleMenu(e){
@@ -2011,6 +2052,12 @@ function buildFloor(){
     if(!chatId) return;
     const vis = visibleMessages();
     if(vis.length) lastSeenTime = Math.max(lastSeenTime, ...vis.map(m => m.time || 0));
+    // tell the other person which of their messages I've actually looked at (double tick)
+    const theirs = Math.max(0, ...vis.filter(m => m.sender !== myRole).map(m => m.time || 0));
+    if(openName === 'chat' && !document.hidden && theirs > mySeenWritten){
+      mySeenWritten = theirs;
+      try{ db.ref('rooms/'+chatId+'/seen/'+myRole).set(theirs).catch(()=>{}); }catch(e){}
+    }
     store.set('chat-seen-'+chatId, String(lastSeenTime));
     try{ if(navigator.clearAppBadge) navigator.clearAppBadge(); }catch(e){}
     updateBookBadge();
@@ -2148,10 +2195,14 @@ function buildFloor(){
   async function openPhotoChooser(){
     const choice = await openDialog({
       icon:'📷', title:'Add a photo', body:'Take one right now, or pick one you already have.',
-      choices:[ { icon:'📸', label:'Take a photo', value:'camera' }, { icon:'🖼️', label:'Choose from gallery', value:'gallery' } ],
+      choices:[].concat(
+        isTouch() ? [{ icon:'📱', label:'Use my phone’s camera app', value:'native' }] : [],
+        [{ icon:'📸', label: isTouch() ? 'Quick camera (flip front/back)' : 'Take a photo', value:'camera' }, { icon:'🖼️', label:'Choose from gallery', value:'gallery' }]
+      ),
       cancelText:'Cancel'
     });
-    if(choice === 'camera') startCamera();
+    if(choice === 'native') $('cam-input').click();
+    else if(choice === 'camera') startCamera();
     else if(choice === 'gallery') $('photo-input').click();
   }
 
@@ -2268,6 +2319,7 @@ function buildFloor(){
     const row = document.createElement('div');
     row.className = 'msg-row ' + (mine ? 'me' : 'them');
     row.dataset.id = m.id;
+    row.dataset.time = m.time || 0;
     row.innerHTML = `
       <div class="mini-tag ${role}">${face(role)}</div>
       <div class="mbody">
@@ -2278,7 +2330,7 @@ function buildFloor(){
             <button class="act" data-act="del" title="Delete" aria-label="Delete">🗑</button>
           </div>
         </div>
-        <div class="msg-time" title="${escapeHtml(full)}">${fmtTime(m.time)}${left}</div>
+        <div class="msg-time" title="${escapeHtml(full)}">${fmtTime(m.time)}${mine ? '<span class="tick">✓</span>' : ''}${left}</div>
       </div>`;
     const img = row.querySelector('.chat-img');
     if(img) img.addEventListener('load', () => { if(stickBottom){ const sc = $('chat-scroll'); sc.scrollTop = sc.scrollHeight; } });
@@ -2323,6 +2375,7 @@ function buildFloor(){
 
     if(anchor !== null) scroll.scrollTop = scroll.scrollHeight - anchor;
     else if(stickBottom || wasEmpty) scroll.scrollTop = scroll.scrollHeight;
+    updateTicks();
   }
   $('chat-scroll').addEventListener('scroll', () => {
     const sc = $('chat-scroll');
@@ -2423,8 +2476,52 @@ function buildFloor(){
     scroll.addEventListener('pointercancel', end);
   })();
 
+  // ---------- typing indicator + seen ticks ----------
+  const otherRole = () => myRole === 'dog' ? 'cat' : 'dog';
+  function updateTicks(){
+    const s = Number(seenState[otherRole()]) || 0;
+    document.querySelectorAll('#chat-list .msg-row.me').forEach(r => {
+      const t = r.querySelector('.tick');
+      if(!t) return;
+      const seen = Number(r.dataset.time) <= s;
+      t.textContent = seen ? '✓✓' : '✓';
+      t.classList.toggle('seen', seen);
+      t.title = seen ? 'Seen' : 'Sent';
+    });
+  }
+  function renderTyping(fresh){
+    const el = $('typing');
+    if(!el) return;
+    const on = !!(chatId && typingState[otherRole()]);
+    clearTimeout(typingHide);
+    if(on){
+      $('typing-name').textContent = nameOf(otherRole()) + ' is typing…';
+      el.style.display = 'flex';
+      if(stickBottom){ const sc = $('chat-scroll'); sc.scrollTop = sc.scrollHeight; }
+      typingHide = setTimeout(() => { el.style.display = 'none'; }, 7000);   // safety: never stays stuck
+    } else el.style.display = 'none';
+  }
+  function onTyping(){
+    if(!chatId) return;
+    if(!$('chat-input').value.trim()){ stopTyping(); return; }
+    const now = Date.now();
+    if(!iAmTyping || now - lastTypingWrite > 3000){
+      iAmTyping = true; lastTypingWrite = now;
+      try{ const r = db.ref('rooms/'+chatId+'/typing/'+myRole); r.set(now).catch(()=>{}); if(r.onDisconnect) r.onDisconnect().remove(); }catch(e){}
+    }
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(stopTyping, 2500);
+  }
+  function stopTyping(){
+    clearTimeout(typingTimer);
+    if(!iAmTyping) return;
+    iAmTyping = false;
+    if(db && chatId){ try{ db.ref('rooms/'+chatId+'/typing/'+myRole).remove().catch(()=>{}); }catch(e){} }
+  }
+
   async function sendMessage(){
     if(!chatId) return;
+    stopTyping();
     const input = $('chat-input');
     const text = input.value.trim();
     if(!text && !pendingImg) return;
